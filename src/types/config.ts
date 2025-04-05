@@ -7,7 +7,9 @@ export type ErrorClass = new (
     errors: string[],
     code: number,
     ...rest: RestParams
-) => Error;
+) => Error & {
+    toJson(): object;
+};
 
 export type ExpressBatteriesConfig = {
     ErrorClass?: ErrorClass | undefined;

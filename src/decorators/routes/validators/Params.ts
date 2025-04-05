@@ -6,10 +6,10 @@ import type {
 } from "valibot";
 import { addValidationMiddleware } from "../../../meta/decorators/validators/functions";
 import { descriptionHttpCode } from "../../../meta/httpCodes";
-import toJsonSchema from "to-json-schema";
 import { paramsMetadata } from "../../../meta/decorators/validators/validators";
 import { routeMetadata } from "../../../meta/decorators/route/route";
 import type { OpenApiRoute } from "../../../types/openApi";
+import { expressBatteriesConfig } from "../../../meta";
 
 export function Params<T extends ObjectEntries>(
     schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
@@ -24,6 +24,11 @@ export function Params<T extends ObjectEntries>(
         const baseResponses: OpenApiRoute["routeOptions"]["responses"] = {
             400: {
                 description: descriptionHttpCode[400],
+                content: {
+                    "application/json": {
+                        schema: expressBatteriesConfig.getErrorSchema(),
+                    },
+                },
             },
             ...(routesOpenApiInfo?.routeOptions?.responses || {}),
         };

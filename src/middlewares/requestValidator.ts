@@ -71,7 +71,7 @@ export const requestValidator =
         if (errors.length > 0) {
             return next(
                 new BadRequestError(
-                    errors.join(","),
+                    "Bad Request Error",
                     errors,
                     httpCodes.BAD_REQUEST,
                 ),

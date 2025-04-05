@@ -10,6 +10,7 @@ import { queryMetadata } from "../../../meta/decorators/validators/validators";
 import { descriptionHttpCode } from "../../../meta/httpCodes";
 import { describeSetting } from "../../../functions/describeSetting";
 import type { OpenApiRoute } from "../../../types/openApi";
+import { expressBatteriesConfig } from "../../../meta";
 
 export function Query<T extends ObjectEntries>(
     schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
@@ -34,7 +35,14 @@ export function Query<T extends ObjectEntries>(
         }));
 
         const baseResponses = {
-            400: { description: descriptionHttpCode[400] },
+            400: {
+                description: descriptionHttpCode[400],
+                content: {
+                    "application/json": {
+                        schema: expressBatteriesConfig.getErrorSchema(),
+                    },
+                },
+            },
             ...(routesOpenApiInfo?.routeOptions?.responses || {}),
         };
 

@@ -10,13 +10,13 @@ import toJsonSchema from "to-json-schema";
 import type { RequestValidationSchema } from "../../types/requestValidationSchema";
 import { isValibotSchema } from "../../functions/isValibotSchema";
 import cleanDeep from "clean-deep";
-import type { ResponseHeaderName } from "../../types";
+import type { FileMimeType } from "../../types";
 
 export interface ResponseTypeProps {
     code: HttpMethodNumber;
     description?: string;
     schema?: object | RequestValidationSchema;
-    header?: ResponseHeaderName;
+    header?: FileMimeType;
 }
 
 export const ResponseType = (

@@ -1,4 +1,6 @@
+import * as v from "valibot";
 import {
+    Body,
     Controller,
     CreateModule,
     expressBatteries,
@@ -10,9 +12,11 @@ import {
 @Controller()
 class a {
     @Get("/a")
+    @Body(v.object({
+        name: v.string(),
+    }))
     @ResponseType({
         code: 200,
-        header: "jose",
     })
     get() {
     }

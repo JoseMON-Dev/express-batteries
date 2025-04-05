@@ -1,4 +1,3 @@
-import toJsonSchema from "to-json-schema";
 import type {
   ErrorMessage,
   ObjectEntries,
@@ -11,6 +10,7 @@ import { routeMetadata } from "../../../meta/decorators/route/route";
 import type { OpenApiRoute } from "../../../types/openApi";
 import { bodyMetadata } from "../../../meta/decorators/validators/validators";
 import type { FileMimeType } from "../../../types";
+import { expressBatteriesConfig } from "../../../meta";
 
 export function Body<T extends ObjectEntries>(
   schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined> | FileMimeType,
@@ -25,6 +25,11 @@ export function Body<T extends ObjectEntries>(
       responses: {
         400: {
           description: descriptionHttpCode[400],
+          content: {
+            "application/json": {
+              schema: expressBatteriesConfig.getErrorSchema(),
+            },
+          },
         },
         ...(routesOpenApiInfo?.routeOptions?.responses || {}),
       },
