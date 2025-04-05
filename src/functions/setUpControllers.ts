@@ -10,7 +10,6 @@ export const setUpControllers = (
     const controllers = container.getAll<IController>(
         ControllerSymbol,
     );
-    console.log(controllers);
     controllers.forEach((controller) => {
         if (!controller.___setUp___) {
             throw new Error(

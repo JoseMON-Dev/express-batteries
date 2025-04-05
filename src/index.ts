@@ -1,7 +1,6 @@
 import { expressBatteriesConfig } from "./meta/config";
 import type { ExpressBatteriesConfig } from "./types/config";
 import { type Express } from "express";
-import app from "express";
 export * from "./decorators/ioc/Inject";
 export * from "./decorators/ioc/Module";
 export * from "./decorators/routes/Controller";
@@ -16,9 +15,11 @@ export * from "./functions/index";
 export * from "./types/index";
 export * from "./middlewares/index";
 export * from "./meta/index";
+import express from "express";
 
 export const expressBatteries = (
     config?: ExpressBatteriesConfig,
-) => {
+): Express => {
     expressBatteriesConfig.setConfig(config);
+    return express();
 };

@@ -23,7 +23,6 @@ type OpenApiSpecsOptions = {
 };
 
 const generateSwaggerDoc = async (props: OpenApiSpecsOptions) => {
-    console.log(SWAGGER_DOC);
     const specs = await getOpenAPISpecs(
         SWAGGER_DOC,
         props,
