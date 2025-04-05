@@ -16,6 +16,7 @@ class a {
         name: v.string(),
     }))
     @ResponseType({
+        headers: ["application/gzip", "application/json"],
         code: 200,
     })
     get() {

@@ -16,11 +16,11 @@ export interface ResponseTypeProps {
     code: HttpMethodNumber;
     description?: string;
     schema?: object | RequestValidationSchema;
-    header?: FileMimeType;
+    headers?: FileMimeType[];
 }
 
 export const ResponseType = (
-    { code, description, schema, header }: ResponseTypeProps,
+    { code, description, schema, headers }: ResponseTypeProps,
 ): MethodDecorator => {
     const obj = schema;
     const responses: ReponseParams = {};
@@ -28,13 +28,14 @@ export const ResponseType = (
         [media: string]: OpenAPIV3.MediaTypeObject | EnhancedMediaTypeObject;
     } | undefined;
     if (obj) {
-        const head = header || "application/json";
+        const head = headers || ["application/json"];
         const schema = isValibotSchema(obj) ? obj : toJsonSchema(obj);
-        content = {
-            [head]: {
+        const content = head.reduce((acc, head) => {
+            acc[head] = {
                 schema: schema as any,
-            },
-        };
+            };
+            return acc;
+        }, {} as Record<string, { schema: any }>);
     }
     if (content) {
         responses[code] = {
@@ -44,7 +45,14 @@ export const ResponseType = (
     } else {
         responses[code] = {
             description: description || descriptionHttpCode[code],
-            content: header ? { [header]: toJsonSchema({}) } as any : undefined,
+            content: headers
+                ? headers.reduce((acc, head) => {
+                    acc[head] = {
+                        schema: schema as any,
+                    };
+                    return acc;
+                }, {} as Record<string, { schema: any }>) as any
+                : undefined,
         };
     }
 
