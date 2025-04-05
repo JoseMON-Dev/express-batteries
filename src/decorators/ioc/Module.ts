@@ -2,12 +2,16 @@ import { Container, type Newable, type ServiceIdentifier } from "inversify";
 import { ControllerSymbol, type IController } from "../../types/DevpsSymbols";
 import type { Express } from "express";
 
-type ServiceInjectable = [ServiceIdentifier, Newable<any>] | [Newable<any>];
-interface ModuleProps {
+export type DependencyLoader = (container: Container) => void;
+export type ServiceInjectable = [ServiceIdentifier, Newable<any>] | [
+    Newable<any>,
+];
+export interface ModuleProps {
     controllers: Newable<any>[];
     services: ServiceInjectable[];
     path: `/${string}`;
     app: Express;
+    dependencyLoaders: DependencyLoader[];
 }
 
 export function CreateModule<T>(
@@ -16,9 +20,13 @@ export function CreateModule<T>(
         services,
         path,
         app,
+        dependencyLoaders,
     }: ModuleProps,
 ) {
     const container = new Container();
+    dependencyLoaders.forEach((fn) => {
+        fn(container);
+    });
     services.forEach((service) => {
         if (service.length === 1) {
             container.bind(service[0]).to(service[0]);
