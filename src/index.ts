@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { expressBatteriesConfig } from "./meta/config";
 import type { ExpressBatteriesConfig } from "./types/config";
 import { type Express } from "express";

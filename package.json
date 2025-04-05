@@ -1,9 +1,10 @@
 {
   "name": "express-batteries",
-  "module": "index.ts",
+  "module": "express-batteries/src/index.ts",
+  "main": "express-batteries/src/index.ts",
   "type": "module",
-  "main": "index.ts",
-  "version": "1.0.0",
+  "version": "1.0.10",
+  "files": ["src"],
   "description": "Express utilities for building REST APIs include decorators for validation, routing, and IOC, and a Swagger Doc generator.",
   "devDependencies": {
     "@types/express": "^5.0.1",
