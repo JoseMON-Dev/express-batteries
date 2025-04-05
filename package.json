@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "1.0.16",
+  "version": "1.0.18",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -14,8 +14,7 @@
   ],
 
   "scripts": {
-    "publish": "npm run build && bun run upload",
-    "upload": "bun publish",
+    "public": "npm run build && bun publish",
     "build": "npx -p typescript tsc $(find src -name '*.ts') --declaration --allowJs --outDir dist --module ESNext --target ES2022 --moduleResolution bundler --esModuleInterop --allowSyntheticDefaultImports --experimentalDecorators --emitDecoratorMetadata --skipLibCheck"
   },
   "description": "Express utilities for building REST APIs include decorators for validation, routing, and IOC, and a Swagger Doc generator.",
