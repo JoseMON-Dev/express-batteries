@@ -1,15 +1,12 @@
 # express-batteries
 
-To install dependencies:
+To install dependencie:
 
 ```bash
-bun install
+bunx jsr add add @camflan/valibot-openapi-generator
 ```
-
-To run:
 
 ```bash
-bun run index.ts
+bun install express-batteries
 ```
 
-This project was created using `bun init` in bun v1.2.8. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
