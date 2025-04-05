@@ -1,13 +1,12 @@
 import type { Container } from "inversify";
 import type { Express, RequestHandler, Router } from "express";
-import { ControllerSymbol, type IController } from "../../types/DevpsSymbols";
+import { type IController } from "../../types/DevpsSymbols.ts";
 import {
     describeRoute,
     type DescribeRouteOptions,
 } from "@camflan/valibot-openapi-generator";
-import { controllerMetadata } from "../../meta/decorators/controller/controller";
-import { SWAGGER_DOC } from "../../meta/docs_swagger";
-import { Console } from "console";
+import { controllerMetadata } from "../../meta/decorators/controller/controller.ts";
+import { SWAGGER_DOC } from "../../meta/docs_swagger.ts";
 
 export function Controller(path?: `/${string}` | undefined): ClassDecorator {
     return <TFunction extends Function>(target: TFunction) => {

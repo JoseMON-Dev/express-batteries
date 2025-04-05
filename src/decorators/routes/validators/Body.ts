@@ -6,36 +6,22 @@ import type {
   ObjectSchema,
 } from "valibot";
 import { descriptionHttpCode } from "../../../meta/httpCodes";
-import { DECORATORS_METADATA_KEYS } from "../../../meta/decorators.metadata";
 import { addValidationMiddleware } from "../../../meta/decorators/validators/functions";
 import { routeMetadata } from "../../../meta/decorators/route/route";
 import type { OpenApiRoute } from "../../../types/openApi";
 import { bodyMetadata } from "../../../meta/decorators/validators/validators";
+import type { FileMimeType } from "../../../types";
 
 export function Body<T extends ObjectEntries>(
-  schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
+  schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined> | FileMimeType,
 ): MethodDecorator {
   return (target, propertyKey) => {
-    bodyMetadata.addRouteBody(
-      schema,
-      target,
-      propertyKey,
-    );
-    addValidationMiddleware(target, propertyKey);
-
     const routesOpenApiInfo = routeMetadata.getRoutesOpenApiInfo(
       target,
       propertyKey,
     );
 
     const baseRouteOptions: OpenApiRoute["routeOptions"] = {
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: schema,
-          },
-        },
-      },
       responses: {
         400: {
           description: descriptionHttpCode[400],
@@ -43,6 +29,36 @@ export function Body<T extends ObjectEntries>(
         ...(routesOpenApiInfo?.routeOptions?.responses || {}),
       },
     };
+
+    if (typeof schema === "string") {
+      // FileMimeType
+      baseRouteOptions.requestBody = {
+        content: {
+          [schema]: {
+            schema: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+        },
+      };
+    } else {
+      bodyMetadata.addRouteBody(schema, target, propertyKey);
+      addValidationMiddleware(target, propertyKey);
+
+      baseRouteOptions.requestBody = {
+        content: {
+          "application/json": {
+            schema: schema,
+          },
+        },
+      };
+    }
 
     const openApiInfo: OpenApiRoute = routesOpenApiInfo
       ? {

@@ -1,3 +1,5 @@
+import type { OptionsJson } from "body-parser";
+
 export type OptionalElement = any | undefined;
 export type RestParams = any[] | undefined[] | OptionalElement;
 export type ErrorClass = new (
@@ -8,5 +10,6 @@ export type ErrorClass = new (
 ) => Error;
 
 export type ExpressBatteriesConfig = {
-    ErrorClass: ErrorClass | undefined;
+    ErrorClass?: ErrorClass | undefined;
+    OptionsJson?: OptionsJson;
 };

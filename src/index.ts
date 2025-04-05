@@ -7,6 +7,15 @@ import express from "express";
 export const expressBatteries = (
     config?: ExpressBatteriesConfig,
 ): Express => {
+    const app = express();
     expressBatteriesConfig.setConfig(config);
-    return express();
+    app.use(express.json(config?.OptionsJson));
+    return app;
 };
+
+export * from "./decorators/index";
+export * from "./errors/index";
+export * from "./functions/index";
+export * from "./meta/index";
+export * from "./middlewares/index";
+export * from "./types/index";

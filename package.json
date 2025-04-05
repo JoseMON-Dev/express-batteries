@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "1.0.18",
+  "version": "1.0.32",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -12,9 +12,45 @@
   "files": [
     "dist"
   ],
-
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./decorators": {
+      "import": "./dist/decorators/index.js",
+      "require": "./dist/decorators/index.cjs",
+      "types": "./dist/decorators/index.d.ts"
+    },
+    "./errors": {
+      "import": "./dist/errors/index.js",
+      "require": "./dist/errors/index.cjs",
+      "types": "./dist/errors/index.d.ts"
+    },
+    "./functions": {
+      "import": "./dist/functions/index.js",
+      "require": "./dist/functions/index.cjs",
+      "types": "./dist/functions/index.d.ts"
+    },
+    "./consts": {
+      "import": "./dist/meta/index.js",
+      "require": "./dist/meta/index.cjs",
+      "types": "./dist/meta/index.d.ts"
+    },
+    "./middlewares": {
+      "import": "./dist/middlewares/index.js",
+      "require": "./dist/middlewares/index.cjs",
+      "types": "./dist/middlewares/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "scripts": {
-    "public": "npm run build && bun publish",
+    "public": "tsup $(find src -name '*.ts') --format esm,cjs --dts --out-dir dist && npx fix-esm-import-path dist && bun publish",
     "build": "npx -p typescript tsc $(find src -name '*.ts') --declaration --allowJs --outDir dist --module ESNext --target ES2022 --moduleResolution bundler --esModuleInterop --allowSyntheticDefaultImports --experimentalDecorators --emitDecoratorMetadata --skipLibCheck"
   },
   "description": "Express utilities for building REST APIs include decorators for validation, routing, and IOC, and a Swagger Doc generator.",
@@ -30,11 +66,14 @@
   },
   "dependencies": {
     "@camflan/valibot-openapi-generator": "npm:@jsr/camflan__valibot-openapi-generator",
-    "express": "^5.1.0",
+    "clean-deep": "^3.4.0",
+    "express": "^4.17.2",
+    "fix-esm-import-path": "^1.10.1",
     "inversify": "^7.5.0",
     "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^5.0.1",
     "to-json-schema": "^0.2.5",
+    "tsup": "^8.4.0",
     "valibot": "^1.0.0"
   }
 }

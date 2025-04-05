@@ -3,15 +3,15 @@ import { ControllerSymbol, type IController } from "../../types/DevpsSymbols";
 import type { Express } from "express";
 
 export type DependencyLoader = (container: Container) => void;
-export type ServiceInjectable = [ServiceIdentifier, Newable<any>] | [
-    Newable<any>,
-];
+export type ServiceInjectable =
+    | [ServiceIdentifier, Newable<any>]
+    | Newable<any>;
 export interface ModuleProps {
     controllers: Newable<any>[];
-    services: ServiceInjectable[];
+    services?: ServiceInjectable[];
     path: `/${string}`;
     app: Express;
-    dependencyLoaders: DependencyLoader[];
+    dependencyLoaders?: DependencyLoader[];
 }
 
 export function CreateModule<T>(
@@ -24,12 +24,12 @@ export function CreateModule<T>(
     }: ModuleProps,
 ) {
     const container = new Container();
-    dependencyLoaders.forEach((fn) => {
+    dependencyLoaders?.forEach((fn) => {
         fn(container);
     });
-    services.forEach((service) => {
-        if (service.length === 1) {
-            container.bind(service[0]).to(service[0]);
+    services?.forEach((service) => {
+        if (!Array.isArray(service)) {
+            container.bind(service).to(service);
             return;
         }
         container.bind(service[0]).to(service[1]);

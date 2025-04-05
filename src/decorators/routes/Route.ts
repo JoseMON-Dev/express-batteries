@@ -13,7 +13,6 @@ import type { DescribeRouteOptions } from "../../types/openApi";
 import { routeMetadata } from "../../meta/decorators/route/route";
 import { descriptionHttpCode } from "../../meta/httpCodes";
 import { controllerMetadata } from "../../meta/decorators/controller/controller";
-import type { Container } from "inversify";
 import { iocMetadata } from "../../meta/decorators/ioc";
 
 const createRouteDecorator = (

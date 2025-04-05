@@ -9,28 +9,45 @@ import type {
 import toJsonSchema from "to-json-schema";
 import type { RequestValidationSchema } from "../../types/requestValidationSchema";
 import { isValibotSchema } from "../../functions/isValibotSchema";
+import cleanDeep from "clean-deep";
+import type { ResponseHeaderName } from "../../types";
+
+export interface ResponseTypeProps {
+    code: HttpMethodNumber;
+    description?: string;
+    schema?: object | RequestValidationSchema;
+    header?: ResponseHeaderName;
+}
 
 export const ResponseType = (
-    code: HttpMethodNumber,
-    description?: string,
-    obj?: object | RequestValidationSchema,
+    { code, description, schema, header }: ResponseTypeProps,
 ): MethodDecorator => {
+    const obj = schema;
     const responses: ReponseParams = {};
     let content: {
         [media: string]: OpenAPIV3.MediaTypeObject | EnhancedMediaTypeObject;
     } | undefined;
     if (obj) {
+        const head = header || "application/json";
         const schema = isValibotSchema(obj) ? obj : toJsonSchema(obj);
         content = {
-            "application/json": {
+            [head]: {
                 schema: schema as any,
             },
         };
     }
-    responses[code] = {
-        description: description || descriptionHttpCode[code],
-        content: content,
-    };
+    if (content) {
+        responses[code] = {
+            description: description || descriptionHttpCode[code],
+            content,
+        };
+    } else {
+        responses[code] = {
+            description: description || descriptionHttpCode[code],
+            content: header ? { [header]: toJsonSchema({}) } as any : undefined,
+        };
+    }
+
     return (target: object, propertyKey: string | symbol): void => {
         const routesOpenApiInfo = routeMetadata.getRoutesOpenApiInfo(
             target,
@@ -55,7 +72,11 @@ export const ResponseType = (
             routeMetadata.saveRoutesOpenApiInfo(
                 {
                     routeOptions: {
-                        responses: responses,
+                        responses: cleanDeep(responses, {
+                            emptyArrays: false,
+                            emptyObjects: false,
+                            emptyStrings: false,
+                        }) as any,
                     },
                 },
                 target,
