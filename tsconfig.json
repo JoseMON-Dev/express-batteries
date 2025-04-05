@@ -1,12 +1,18 @@
 {
+  "include": ["src/index.ts"],
+
   "compilerOptions": {
     // Environment setup & latest features
     "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
+    "rootDir": "src",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "outDir": "dist",
     "allowJs": true,
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
 

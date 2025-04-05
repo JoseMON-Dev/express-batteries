@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import type { Dependency } from "../../types/ioc";
 import { DECORATORS_METADATA_KEYS } from "../decorators.metadata";
 

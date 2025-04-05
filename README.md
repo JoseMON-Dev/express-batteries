@@ -1,12 +1,35 @@
-# express-batteries
+# 🚀 express-batteries
 
-To install dependencie:
+Express utilities for building REST APIs — includes decorators for validation, routing, IoC, and automatic Swagger documentation generation.
 
-```bash
-bunx jsr add @camflan/valibot-openapi-generator
-```
+A batteries-included starter to help you kickstart your backend with modern tools and a clean architecture.
 
-```bash
-bun install express-batteries
-```
+## 📦 Installation
 
+Before installing, create a `.npmrc` file at the root of your project with the following content:
+
+<pre>
+<code>@jsr:registry=https://npm.jsr.io</code>
+</pre>
+
+Then, install the package using your preferred package manager:
+
+### Bun
+<pre>
+<code>bun install express-batteries</code>
+</pre>
+
+### npm
+<pre>
+<code>npm install express-batteries</code>
+</pre>
+
+### Yarn
+<pre>
+<code>yarn add express-batteries</code>
+</pre>
+
+### pnpm
+<pre>
+<code>pnpm add express-batteries</code>
+</pre>

@@ -1,7 +1,7 @@
+import "reflect-metadata";
 import { type RequestHandler, Router } from "express";
 import { DECORATORS_METADATA_KEYS } from "../../decorators.metadata";
 import type { OpenApiRoute } from "../../../types/openApi";
-import { set } from "valibot";
 import type { Container } from "inversify";
 
 export const controllerMetadata = {

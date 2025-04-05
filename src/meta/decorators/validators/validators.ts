@@ -1,7 +1,7 @@
+import "reflect-metadata";
 import type { ValidatorDecoratorProps } from "../../../types/decorator";
 import type { ObjectEntries } from "valibot";
 import { DECORATORS_METADATA_KEYS } from "../../decorators.metadata";
-import { get } from "http";
 import type { RequestValidationSchema } from "../../../types/requestValidationSchema";
 
 export const bodyMetadata = {
