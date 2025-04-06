@@ -8,9 +8,18 @@ import {
     ResponseType,
     swaggerUI,
 } from "./src/index";
+import { inject, injectable } from "inversify";
+
+@injectable()
+class service {
+}
 
 @Controller()
 class a {
+    constructor(
+        @inject(service) public service: service,
+    ) {}
+
     @Get("/a")
     @Body(v.object({
         name: v.string(),
@@ -28,9 +37,8 @@ CreateModule({
     app,
     path: "/img",
     controllers: [a],
+    services: [service],
 });
-
-console.log("sd");
 
 const [html, json] = await swaggerUI({
     documentation: {

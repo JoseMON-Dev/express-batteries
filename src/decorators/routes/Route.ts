@@ -25,8 +25,11 @@ const createRouteDecorator = (
         return function (
             target: Record<string | symbol, any>,
             propertyKey: string | symbol,
+            descriptor,
         ) {
-            const handler = target[propertyKey];
+            console.log(descriptor);
+            const fn: Function = target[propertyKey];
+            const handler = fn.bind(target);
             const middlewares: RequestHandler[] = routeMetadata
                 .getRouteMiddlewares(
                     target,
