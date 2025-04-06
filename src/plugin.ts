@@ -1,7 +1,7 @@
 import ts from "typescript";
-export default function transformer(program) {
-    return (context) => {
-        const visitor = (node) => {
+export default function transformer(program: any) {
+    return (context: any) => {
+        const visitor = (node: any) => {
             if (ts.isCallExpression(node)) {
                 if (
                     ts.isPropertyAccessExpression(node.expression) &&
@@ -10,7 +10,7 @@ export default function transformer(program) {
                     node.expression.name.text === "name"
                 ) {
                     if (node.typeArguments && node.typeArguments.length === 1) {
-                        const typeArg = node.typeArguments[0];
+                        const typeArg = node.typeArguments[0] as any;
                         if (
                             ts.isTypeReferenceNode(typeArg) &&
                             ts.isIdentifier(typeArg.typeName)
@@ -24,6 +24,6 @@ export default function transformer(program) {
             return ts.visitEachChild(node, visitor, context);
         };
 
-        return (node) => ts.visitNode(node, visitor);
+        return (node: any) => ts.visitNode(node, visitor);
     };
 }

@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
