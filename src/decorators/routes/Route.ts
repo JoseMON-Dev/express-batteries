@@ -27,6 +27,12 @@ const createRouteDecorator = (
             propertyKey: string | symbol,
             descriptor,
         ) {
+            if (props === undefined || props?.parameters === undefined) {
+                props = {
+                    ...props,
+                    parameters: [],
+                };
+            }
             const handler = target[propertyKey] as Function;
             const middlewares: RequestHandler[] = routeMetadata
                 .getRouteMiddlewares(

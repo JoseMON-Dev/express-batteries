@@ -29,7 +29,9 @@ export const ResponseType = (
     } | undefined;
     if (obj) {
         const head = headers || ["application/json"];
-        const schema = isValibotSchema(obj) ? obj : toJsonSchema(obj);
+        const schema = isValibotSchema(obj)
+            ? obj
+            : JSON.parse(JSON.stringify(toJsonSchema(obj)));
         content = head.reduce((acc, head) => {
             acc[head] = {
                 schema: schema as any,
