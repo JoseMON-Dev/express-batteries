@@ -30,7 +30,7 @@ export const ResponseType = (
     if (obj) {
         const head = headers || ["application/json"];
         const schema = isValibotSchema(obj) ? obj : toJsonSchema(obj);
-        const content = head.reduce((acc, head) => {
+        content = head.reduce((acc, head) => {
             acc[head] = {
                 schema: schema as any,
             };
