@@ -27,8 +27,7 @@ const createRouteDecorator = (
             propertyKey: string | symbol,
             descriptor,
         ) {
-            const fn: Function = target[propertyKey];
-            const handler = fn.bind(target);
+            const handler = target[propertyKey] as Function;
             const middlewares: RequestHandler[] = routeMetadata
                 .getRouteMiddlewares(
                     target,
@@ -87,6 +86,7 @@ const createRouteDecorator = (
             const router: Router = controllerMetadata.createRouter(
                 target.constructor,
             );
+
             router[method.toLowerCase() as HttpMethodsExpress](
                 path,
                 ...middlewares,
@@ -125,7 +125,12 @@ const createRouteDecorator = (
                             }
                         }
 
-                        await handler(...params);
+                        const controllerInstance = controllerMetadata
+                            .getControllerInstance(
+                                target.constructor,
+                            );
+                        const fn = handler.bind(controllerInstance);
+                        await fn(...params);
                     } catch (error) {
                         next(error);
                     }

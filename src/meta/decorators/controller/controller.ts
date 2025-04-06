@@ -3,6 +3,7 @@ import { type RequestHandler, Router } from "express";
 import { DECORATORS_METADATA_KEYS } from "../../decorators.metadata";
 import type { OpenApiRoute } from "../../../types/openApi";
 import type { Container } from "inversify";
+import { ControllerSymbol } from "../../../types";
 
 export const controllerMetadata = {
     MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
@@ -10,6 +11,7 @@ export const controllerMetadata = {
     IOC_CONTAINER: DECORATORS_METADATA_KEYS.IOC_CONTAINER,
     ROUTER: DECORATORS_METADATA_KEYS.ROUTER,
     PATH: DECORATORS_METADATA_KEYS.PATH,
+    INSTANCE: DECORATORS_METADATA_KEYS.IOC_CONTROLLER_INSTANCE,
 
     getPath: (constructor: Function): string | undefined => {
         return Reflect.getMetadata(controllerMetadata.PATH, constructor);
@@ -25,6 +27,25 @@ export const controllerMetadata = {
             Router();
         Reflect.defineMetadata(controllerMetadata.ROUTER, router, constructor);
         return router;
+    },
+
+    getControllerInstance: (constructor: Function): object => {
+        const container = controllerMetadata.getIocContainer(constructor);
+        const controller = Reflect.getMetadata(
+                controllerMetadata.INSTANCE,
+                constructor,
+            ) ||
+                container !== undefined
+            ? container?.get(
+                ControllerSymbol,
+            )
+            : undefined;
+        Reflect.defineMetadata(
+            controllerMetadata.INSTANCE,
+            controller,
+            constructor,
+        );
+        return controller as object;
     },
 
     getRouter: (constructor: Function): Router | undefined => {

@@ -12,6 +12,9 @@ import { inject, injectable } from "inversify";
 
 @injectable()
 class service {
+    a() {
+        console.log("asdsad");
+    }
 }
 
 @Controller()
@@ -21,21 +24,19 @@ class a {
     ) {}
 
     @Get("/a")
-    @Body(v.object({
-        name: v.string(),
-    }))
     @ResponseType({
         headers: ["application/gzip", "application/json"],
         code: 200,
     })
     get() {
+        this.service.a();
     }
 }
 const app = expressBatteries();
 
 CreateModule({
     app,
-    path: "/img",
+    path: "/",
     controllers: [a],
     services: [service],
 });
