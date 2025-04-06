@@ -2,6 +2,11 @@
   "include": ["src/index.ts"],
 
   "compilerOptions": {
+    "plugins": [
+     {
+        "transform": "./dist/plugin.js",
+      }
+    ],
     // Environment setup & latest features
     "lib": ["ESNext"],
     "target": "ESNext",

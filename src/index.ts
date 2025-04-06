@@ -19,3 +19,4 @@ export * from "./functions/index";
 export * from "./meta/index";
 export * from "./middlewares/index";
 export * from "./types/index";
+export * from "./nameTsPlugin";
