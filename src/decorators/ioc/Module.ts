@@ -28,12 +28,11 @@ export function CreateModule<T>(
         fn(container);
     });
     services?.forEach((service) => {
-        if (!Array.isArray(service)) {
-            container.bind(service).to(service);
-            return;
-        }
-        container.bind(service[0]).to(service[1]);
+        Array.isArray(service)
+            ? container.bind(service[0]).to(service[1])
+            : container.bind(service).to(service);
     });
+
     controllers.forEach((c) => {
         container.bind(ControllerSymbol).to(
             c,
