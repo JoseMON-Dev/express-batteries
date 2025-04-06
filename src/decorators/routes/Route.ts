@@ -32,7 +32,7 @@ const createRouteDecorator = (
                 .getRouteMiddlewares(
                     target,
                     propertyKey,
-                );
+                ).reverse();
 
             const routesOpenApiInfo = routeMetadata.getRoutesOpenApiInfo(
                 target,
@@ -51,6 +51,9 @@ const createRouteDecorator = (
                                 500: {
                                     description: descriptionHttpCode[500],
                                 },
+                                200: {
+                                    description: descriptionHttpCode[200],
+                                },
                                 ...routesOpenApiInfo.routeOptions?.responses,
                             },
                             ...props,
@@ -68,6 +71,9 @@ const createRouteDecorator = (
                             responses: {
                                 500: {
                                     description: descriptionHttpCode[400],
+                                },
+                                200: {
+                                    description: descriptionHttpCode[200],
                                 },
                             },
                             ...props,

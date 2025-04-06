@@ -28,4 +28,5 @@ export type FileMimeType =
     | "audio/wav"
     | "video/mp4"
     | "video/x-msvideo"
-    | "video/quicktime";
+    | "video/quicktime"
+    | (string & {});

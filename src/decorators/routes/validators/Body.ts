@@ -13,8 +13,18 @@ import type { FileMimeType } from "../../../types";
 import { expressBatteriesConfig } from "../../../meta";
 
 export function Body<T extends ObjectEntries>(
-  schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined> | FileMimeType,
+  decoratorProps: {
+    schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>;
+    headers?: FileMimeType[];
+  } | ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
 ): MethodDecorator {
+  const schema = "schema" in decoratorProps
+    ? decoratorProps.schema
+    : decoratorProps;
+
+  const headers = "schema" in decoratorProps
+    ? decoratorProps.headers || ["application/json"]
+    : ["application/json"];
   return (target, propertyKey) => {
     const routesOpenApiInfo = routeMetadata.getRoutesOpenApiInfo(
       target,
@@ -35,35 +45,19 @@ export function Body<T extends ObjectEntries>(
       },
     };
 
-    if (typeof schema === "string") {
-      // FileMimeType
-      baseRouteOptions.requestBody = {
-        content: {
-          [schema]: {
-            schema: {
-              type: "object",
-              properties: {
-                file: {
-                  type: "string",
-                  format: "binary",
-                },
-              },
-            },
-          },
-        },
+    const c = {} as any;
+    const list = Array.isArray(headers) ? headers : [headers];
+    list.forEach((h) => {
+      c[h] = {
+        schema: schema,
       };
-    } else {
-      bodyMetadata.addRouteBody(schema, target, propertyKey);
-      addValidationMiddleware(target, propertyKey);
+    });
 
-      baseRouteOptions.requestBody = {
-        content: {
-          "application/json": {
-            schema: schema,
-          },
-        },
-      };
-    }
+    bodyMetadata.addRouteBody(schema, target, propertyKey);
+    addValidationMiddleware(target, propertyKey);
+    baseRouteOptions.requestBody = {
+      content: c,
+    };
 
     const openApiInfo: OpenApiRoute = routesOpenApiInfo
       ? {
