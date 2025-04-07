@@ -9,7 +9,6 @@ export const expressBatteries = (
 ): Express => {
     const app = express();
     expressBatteriesConfig.setConfig(config);
-    app.use(express.json(config?.OptionsJson));
     return app;
 };
 

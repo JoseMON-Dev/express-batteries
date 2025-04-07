@@ -1,4 +1,5 @@
 import type {
+  BaseSchema,
   ErrorMessage,
   ObjectEntries,
   ObjectIssue,
@@ -9,22 +10,19 @@ import { addValidationMiddleware } from "../../../meta/decorators/validators/fun
 import { routeMetadata } from "../../../meta/decorators/route/route";
 import type { OpenApiRoute } from "../../../types/openApi";
 import { bodyMetadata } from "../../../meta/decorators/validators/validators";
-import type { FileMimeType } from "../../../types";
 import { expressBatteriesConfig } from "../../../meta";
 
-export function Body<T extends ObjectEntries>(
-  decoratorProps: {
-    schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>;
-    headers?: FileMimeType[];
-  } | ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
-): MethodDecorator {
-  const schema = "schema" in decoratorProps
-    ? decoratorProps.schema
-    : decoratorProps;
+export type BodyObjectHEaders =
+  | "application/json"
+  | "application/xml"
+  | "text/xml"
+  | "text/csv"
+  | (string & {});
 
-  const headers = "schema" in decoratorProps
-    ? decoratorProps.headers || ["application/json"]
-    : ["application/json"];
+export function Body<T extends ObjectEntries>(
+  schema: ObjectSchema<T, ErrorMessage<ObjectIssue> | undefined>,
+): MethodDecorator {
+  const headers = ["application/json"];
   return (target, propertyKey) => {
     const routesOpenApiInfo = routeMetadata.getRoutesOpenApiInfo(
       target,

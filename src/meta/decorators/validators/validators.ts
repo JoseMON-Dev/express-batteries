@@ -11,9 +11,9 @@ export const bodyMetadata = {
         target: object,
         propertyKey: string | symbol,
     ) => {
-        if (Reflect.getMetadata(paramsMetadata.key, target, propertyKey)) {
+        if (Reflect.getMetadata(bodyMetadata.key, target, propertyKey)) {
             throw new Error(
-                `Metadata ${paramsMetadata.key} already exists on ${target}#${
+                `Metadata ${bodyMetadata.key} already exists on ${target.constructor.name}#${
                     typeof propertyKey === "symbol"
                         ? propertyKey.description
                         : propertyKey
@@ -46,7 +46,7 @@ export const queryMetadata = {
     ) => {
         if (Reflect.getMetadata(queryMetadata.key, target, propertyKey)) {
             throw new Error(
-                `Metadata ${queryMetadata.key} already exists on ${target}#${
+                `Metadata ${queryMetadata.key} already exists on ${target.constructor.name}#${
                     typeof propertyKey === "symbol"
                         ? propertyKey.description
                         : propertyKey
@@ -79,7 +79,7 @@ export const paramsMetadata = {
     ) => {
         if (Reflect.getMetadata(paramsMetadata.key, target, propertyKey)) {
             throw new Error(
-                `Metadata ${paramsMetadata.key} already exists on ${target}#${
+                `Metadata ${paramsMetadata.key} already exists on ${target.constructor.name}#${
                     typeof propertyKey === "symbol"
                         ? propertyKey.description
                         : propertyKey

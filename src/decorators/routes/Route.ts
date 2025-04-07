@@ -20,7 +20,7 @@ const createRouteDecorator = (
 ) => {
     return function (
         path: `/${string}` | "/",
-        props?: Omit<Omit<DescribeRouteOptions, "method">, "responses">,
+        props?: Omit<DescribeRouteOptions, "method">,
     ): MethodDecorator {
         return function (
             target: Record<string | symbol, any>,
