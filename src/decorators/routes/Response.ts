@@ -63,6 +63,11 @@ export const ResponseType = (
             target,
             propertyKey,
         );
+        const cleanedResponses = cleanDeep(responses, {
+            emptyArrays: false,
+            emptyObjects: false,
+            emptyStrings: false,
+        }) as any;
         if (routesOpenApiInfo) {
             routeMetadata.saveRoutesOpenApiInfo(
                 {
@@ -71,7 +76,7 @@ export const ResponseType = (
                         ...routesOpenApiInfo.routeOptions,
                         responses: {
                             ...routesOpenApiInfo.routeOptions.responses,
-                            ...responses,
+                            ...cleanedResponses,
                         },
                     },
                 },
@@ -82,11 +87,7 @@ export const ResponseType = (
             routeMetadata.saveRoutesOpenApiInfo(
                 {
                     routeOptions: {
-                        responses: cleanDeep(responses, {
-                            emptyArrays: false,
-                            emptyObjects: false,
-                            emptyStrings: false,
-                        }) as any,
+                        responses: { ...cleanedResponses },
                     },
                 },
                 target,
