@@ -2,13 +2,17 @@ import "reflect-metadata";
 import { expressBatteriesConfig } from "./meta/config";
 import type { ExpressBatteriesConfig } from "./types/config";
 import { type Express } from "express";
-import express from "express";
+import cors from "cors";
 
 export const expressBatteries = (
     config?: ExpressBatteriesConfig,
 ): Express => {
-    const app = express();
-    expressBatteriesConfig.setConfig(config);
+    expressBatteriesConfig.setConfig({ ...config });
+    const app = expressBatteriesConfig.getExpressApp();
+    app.use(cors(
+        { ...config?.cors },
+    ));
+
     return app;
 };
 

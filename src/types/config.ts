@@ -1,4 +1,5 @@
-import type { OptionsJson } from "body-parser";
+import type { Application } from "express";
+import type { CorsOptions } from "cors";
 
 export type OptionalElement = any | undefined;
 export type RestParams = any[] | undefined[] | OptionalElement;
@@ -13,5 +14,5 @@ export type ErrorClass = new (
 
 export type ExpressBatteriesConfig = {
     ErrorClass?: ErrorClass | undefined;
-    OptionsJson?: OptionsJson;
+    cors?: CorsOptions;
 };

@@ -1,1 +1,1 @@
-export * from "socketio";
+export * from "socket.io";
