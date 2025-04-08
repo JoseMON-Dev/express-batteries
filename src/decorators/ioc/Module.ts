@@ -14,7 +14,7 @@ export interface ModuleProps {
     dependencyLoaders?: DependencyLoader[];
 }
 
-export function CreateModule<T>(
+export function createModule(
     {
         controllers,
         services,
@@ -23,6 +23,9 @@ export function CreateModule<T>(
         dependencyLoaders,
     }: ModuleProps,
 ) {
+    if (path === "/") {
+        throw new Error("The path is required oly '/' path is invalid");
+    }
     const container = new Container();
     dependencyLoaders?.forEach((fn) => {
         fn(container);

@@ -1,8 +1,6 @@
-import * as v from "valibot";
 import {
-    Body,
     Controller,
-    CreateModule,
+    createModule,
     expressBatteries,
     Get,
     ResponseType,
@@ -34,14 +32,14 @@ class a {
 }
 const app = expressBatteries();
 
-CreateModule({
+createModule({
     app,
-    path: "/",
+    path: "/str",
     controllers: [a],
     services: [service],
 });
 
-const [html, json] = await swaggerUI({
+const { html, json } = await swaggerUI({
     documentation: {
         info: {
             title: "PixPro Backend",
@@ -51,6 +49,7 @@ const [html, json] = await swaggerUI({
     },
 });
 
+app.use("/", html);
 app.use("/json", json);
 
 app.listen(8080, () => {

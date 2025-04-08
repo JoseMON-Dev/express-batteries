@@ -1,5 +1,4 @@
 import type {
-  BaseSchema,
   ErrorMessage,
   ObjectEntries,
   ObjectIssue,

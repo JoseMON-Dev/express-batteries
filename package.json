@@ -18,11 +18,31 @@
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
+    "./express": {
+      "import": "./dist/libs/express/index.js",
+      "require": "./dist/libs/express/index.cjs",
+      "types": "./dits/libs/express/index.d.ts"
+    },
+    "./inversify": {
+      "import": "./dist/libs/inversify/index.js",
+      "require": "./dist/libs/inversify/index.cjs",
+      "types": "./dits/libs/inversify/index.d.ts"
+    },
+    "./valibot": {
+      "import": "./dist/libs/valibot/index.js",
+      "require": "./dist/libs/valibot/index.cjs",
+      "types": "./dits/libs/valibot/index.d.ts"
+    },
     "./plugin": {
-			"import": "./dist/plugin.js",
-			"require": "./dist/plugin.cjs",
-			"types": "./dist/plgin.d.ts"
-		},
+      "import": "./dist/plugin.js",
+      "require": "./dist/plugin.cjs",
+      "types": "./dist/plugin.d.ts"
+    },
+    "./openApi": {
+      "import": "./dist/libs/openApi/index.js",
+      "require": "./dist/libs/openApi/index.cjs",
+      "types": "./dits/libs/openApi/index.d.ts"
+    },
     "./decorators": {
       "import": "./dist/decorators/index.js",
       "require": "./dist/decorators/index.cjs",
@@ -76,6 +96,7 @@
     "fix-esm-import-path": "^1.10.1",
     "inversify": "^7.5.0",
     "reflect-metadata": "^0.2.2",
+    "socketio": "^1.0.0",
     "swagger-ui-express": "^5.0.1",
     "to-json-schema": "^0.2.5",
     "tsup": "^8.4.0",

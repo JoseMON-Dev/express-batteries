@@ -8,7 +8,9 @@ import {
 import { controllerMetadata } from "../../meta/decorators/controller/controller.ts";
 import { SWAGGER_DOC } from "../../meta/docs_swagger.ts";
 
-export function Controller(path?: `/${string}` | undefined): ClassDecorator {
+export function Controller(
+    path?: `/${string}` | undefined,
+): ClassDecorator {
     return <TFunction extends Function>(target: TFunction) => {
         const router = controllerMetadata.getRouter(target);
 

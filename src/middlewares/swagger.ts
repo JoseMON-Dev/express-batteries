@@ -4,6 +4,7 @@ import {
     type Request,
     type RequestHandler,
     type Response,
+    Router,
 } from "express";
 import type { OpenAPIV3 } from "openapi-types";
 import { SWAGGER_DOC } from "../meta";
@@ -32,7 +33,10 @@ const generateSwaggerDoc = async (props: OpenApiSpecsOptions) => {
 
 export const swaggerUI = async (
     props: OpenApiSpecsOptions,
-): Promise<[RequestHandler, RequestHandler]> => {
+): Promise<{
+    html: RequestHandler;
+    json: RequestHandler;
+}> => {
     const doc = await generateSwaggerDoc(props);
     const docHandler: RequestHandler = (
         _: Request,
@@ -41,5 +45,9 @@ export const swaggerUI = async (
     ) => {
         res.json(doc);
     };
-    return [swaggerUi.setup(doc), docHandler];
+    const routerHtml = Router().use(swaggerUi.serve, swaggerUi.setup(doc));
+    return {
+        html: routerHtml,
+        json: docHandler,
+    };
 };
