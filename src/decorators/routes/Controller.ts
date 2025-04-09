@@ -1,5 +1,5 @@
 import type { Container } from "inversify";
-import type { Express, RequestHandler, Router } from "express";
+import type { Application, Express, RequestHandler, Router } from "express";
 import { type IController } from "../../types/DevpsSymbols.ts";
 import {
     describeRoute,
@@ -21,7 +21,7 @@ export function Controller(
         }
         const proto = target.prototype as IController;
         proto.___setUp___ = (
-            app: Express,
+            app: Application,
             basePath: `/${string}`,
             container: Container,
         ) => {

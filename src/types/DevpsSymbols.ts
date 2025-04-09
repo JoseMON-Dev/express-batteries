@@ -1,10 +1,10 @@
 import type { Container } from "inversify";
-import type { Express } from "express";
+import type { Application } from "express";
 
 export const ControllerSymbol = Symbol.for("Controller");
 export type IController = {
     ___setUp___: (
-        app: Express,
+        app: Application,
         path: `/${string}`,
         container: Container,
     ) => void;

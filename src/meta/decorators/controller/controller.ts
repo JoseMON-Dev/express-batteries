@@ -37,7 +37,7 @@ export const controllerMetadata = {
             ) ||
                 container !== undefined
             ? container?.get(
-                ControllerSymbol,
+                Symbol.for(constructor.name),
             )
             : undefined;
         Reflect.defineMetadata(

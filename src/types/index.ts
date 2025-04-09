@@ -8,3 +8,4 @@ export * from "./openApi";
 export * from "./requestValidationSchema";
 export * from "./httpfileheaders";
 export * from "./responseHeaders";
+export * from "./ExpressBatteriesApplication";
