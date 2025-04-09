@@ -11,7 +11,8 @@ import { inject, injectable } from "inversify";
 @injectable()
 class service {
     a() {
-        console.log("asdsad");
+        console.log(" service from controller call");
+        return "service";
     }
 }
 
@@ -19,15 +20,33 @@ class service {
 class a {
     constructor(
         @inject(service) public service: service,
-    ) {}
+    ) {
+    }
 
     @Get("/a")
     @ResponseType({
         headers: ["application/gzip", "application/json"],
         code: 200,
     })
-    get() {
-        this.service.a();
+    get(req, res) {
+        res.send(this.service.a());
+    }
+}
+
+@Controller("/b")
+class B {
+    constructor(
+        @inject(service) public service: service,
+    ) {
+    }
+
+    @Get("/a")
+    @ResponseType({
+        headers: ["application/gzip", "application/json"],
+        code: 200,
+    })
+    get(req, res) {
+        res.send(this.service.a());
     }
 }
 const app = expressBatteries();
@@ -35,7 +54,7 @@ const app = expressBatteries();
 createModule({
     app,
     path: "/str",
-    controllers: [a],
+    controllers: [a, B],
     services: [service],
 });
 

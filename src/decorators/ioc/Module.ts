@@ -40,6 +40,7 @@ export function createModule(
         container.bind(ControllerSymbol).to(
             c,
         ).inSingletonScope();
+        container.bind(Symbol.for(c.name)).to(c).inSingletonScope();
     });
     container.getAll<IController>(ControllerSymbol).forEach((c) => {
         c.___setUp___(app, path, container);
