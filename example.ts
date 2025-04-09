@@ -1,13 +1,18 @@
 import {
+    ApiError,
     Body,
     Controller,
     createModule,
     expressBatteries,
     Get,
+    Params,
+    Post,
     ResponseType,
     swaggerUI,
 } from "./src/index";
 import { inject, injectable } from "inversify";
+import express, { NextFunction, Request, Response } from "express";
+import * as v from "valibot";
 import {
     onConnectionWebSocketGateWay,
     onDisconnectSocketGateWay,
@@ -53,12 +58,17 @@ class B {
     ) {
     }
 
-    @Get("/a")
+    @Post("/a/:id")
     @ResponseType({
         headers: ["application/gzip", "application/json"],
         code: 200,
     })
-    get(req, res) {
+    @Params(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    @Body(v.object({
+        title: v.pipe(v.string(), v.uuid()),
+        description: v.optional(v.string()),
+    }))
+    exampletestting(req, res) {
         res.send(this.service.a());
     }
 }
@@ -116,7 +126,7 @@ class Ws2 {
 }
 
 const app = expressBatteries();
-
+app.express.use(express.json());
 new Server();
 
 createModule({
@@ -139,4 +149,34 @@ const { html, json } = await swaggerUI({
 
 app.express.use("/", html);
 app.express.use("/json", json);
+
+export const errorHandlingMiddleware = (
+    err: Error,
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    console.log(err);
+    try {
+        if (err instanceof ApiError) {
+            res.status(err.code).json(err.toJson());
+            return;
+        }
+        res
+            .status(500)
+            .json(
+                new ApiError(
+                    err.message,
+                    [
+                        "Internal server error",
+                    ],
+                    500,
+                ).toJson(),
+            );
+    } catch (error) {
+        next(error);
+    }
+};
+
+app.express.use(errorHandlingMiddleware);
 app.listen(8080);

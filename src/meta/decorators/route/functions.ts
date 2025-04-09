@@ -13,6 +13,7 @@ export function createValidationRequestMiddleware(
     const bodySchema = bodyMetadata.getRouteBody(target, propertyKey);
     const paramsSchema = paramsMetadata.getRouteParams(target, propertyKey);
     const querySchema = queryMetadata.getRouteQuery(target, propertyKey);
+
     const handler = requestValidator({
         bodySchema,
         paramsSchema,
