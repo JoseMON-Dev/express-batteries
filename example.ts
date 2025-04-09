@@ -12,7 +12,7 @@ import {
     onConnectionWebSocketGateWay,
     onDisconnectSocketGateWay,
     OnWsEvent,
-    WebSocketEventHandlerMiddleware,
+    type WebSocketEventHandlerMiddleware,
     WsBody,
     WsGateway,
     WsServer,
