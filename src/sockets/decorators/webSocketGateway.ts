@@ -1,6 +1,6 @@
 import { socketMetadata } from "../meta/socketMetadata";
 
-export function WebSocketGateway(): ClassDecorator {
+export function WsGateway(): ClassDecorator {
     return (target: Function) => {
         socketMetadata.setIsGateWay(target);
     };

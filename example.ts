@@ -1,4 +1,5 @@
 import {
+    Body,
     Controller,
     createModule,
     expressBatteries,
@@ -10,12 +11,15 @@ import { inject, injectable } from "inversify";
 import {
     onConnectionWebSocketGateWay,
     onDisconnectSocketGateWay,
-    OnWebSocketEvent,
-    WebSocketGateway,
-    WebSocketServer,
+    OnWsEvent,
+    WebSocketEventHandlerMiddleware,
+    WsBody,
+    WsGateway,
+    WsServer,
 } from "./src/sockets";
 import { Server, Socket } from "socket.io";
-import { serve } from "swagger-ui-express";
+import { WsSocket } from "./src/sockets/decorators/webSocketParam";
+import { WsMiddlewares } from "./src/sockets/decorators/webSocketMiddlewares";
 
 @injectable()
 class service {
@@ -59,31 +63,55 @@ class B {
     }
 }
 
-@WebSocketGateway()
-class Ws implements onConnectionWebSocketGateWay, onDisconnectSocketGateWay {
-    onServerDisconnection(
-        socket: Socket,
-        server: Server,
-        body: any,
-    ): void | Promise<void> {
-        console.log(socket, server, body);
+@WsGateway()
+class Ws {
+    @OnWsEvent("joinWs")
+    joinRoom(
+        @WsSocket() socket: Socket,
+    ) {
+        socket.join("room-ws");
+        socket.emit("joined", "Estás en room-ws");
     }
-    private readonly sample = "pepe";
 
-    onServerConnection(socket: Socket): void | Promise<void> {
-        console.log("connected in " + socket.id, " " + this.sample);
-    }
-    @OnWebSocketEvent("sample")
-    async p(@WebSocketServer() server: Server) {
-        console.log(this.sample);
+    @OnWsEvent("sendToWs")
+    handleMessage(
+        @WsServer() server: Server,
+        @WsBody() msg: string,
+    ) {
+        console.log("WS → mensaje:", msg);
+        server.to("room-ws").emit("msgFromWs", "WS → mensaje: " + msg);
     }
 }
 
-@WebSocketGateway()
+const WsMiddleware: WebSocketEventHandlerMiddleware<string> = async (
+    server,
+    socket,
+    ctx,
+    next,
+) => {
+    console.log("middleware ", server.eventNames(), socket.id, ctx);
+    ctx.body = "nuevo";
+    await next();
+};
+
+@WsGateway()
 class Ws2 {
-    @OnWebSocketEvent("sample")
-    async p(@WebSocketServer() server: Server) {
-        console.log(server);
+    @OnWsEvent("joinWs2")
+    joinRoom(
+        @WsSocket() socket: Socket,
+    ) {
+        socket.join("room-ws2");
+        socket.emit("joined", "Estás en room-ws2");
+    }
+
+    @OnWsEvent("sendToWs2")
+    @WsMiddlewares([WsMiddleware])
+    handleMessage(
+        @WsServer() server: Server,
+        @WsBody() msg: string,
+    ) {
+        console.log("WS2 → mensaje:", msg);
+        server.to("room-ws2").emit("msgFromWs2", msg);
     }
 }
 
@@ -95,7 +123,7 @@ createModule({
     app,
     path: "/str",
     controllers: [a, B],
-    webSockets: [Ws],
+    webSockets: [Ws, Ws2],
     services: [service],
 });
 

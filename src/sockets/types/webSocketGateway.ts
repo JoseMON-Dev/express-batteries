@@ -8,6 +8,5 @@ export interface onDisconnectSocketGateWay {
     onServerDisconnection(
         socket: Socket,
         server: Server,
-        body: any,
     ): void | Promise<void>;
 }

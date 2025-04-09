@@ -11,22 +11,34 @@ export const startWebSockets = () => {
     if (socketMetadata.getGateWayList().length > 0) {
         const server = socketMetadata.getServer();
 
-        server.on("connection", (socket) => {
-            webSocketGateWayList.forEach((ws) => {
-                const instance = socketMetadata.getGateWayInstance(
-                    ws,
-                ) as onConnectionWebSocketGateWay & onDisconnectSocketGateWay;
-                instance.onServerConnection(socket, server);
+        server.on("connection", async (socket) => {
+            for (let i = 0; i < webSocketGateWayList.length; i++) {
+                const ws = webSocketGateWayList[i];
+                if (ws) {
+                    const instance = socketMetadata.getGateWayInstance(
+                        ws,
+                    ) as
+                        & onConnectionWebSocketGateWay
+                        & onDisconnectSocketGateWay;
+                    if (instance.onServerConnection) {
+                        await instance.onServerConnection(socket, server);
+                    }
 
-                const handlers = socketMetadata.getAllEventHandlers(ws);
-                handlers.forEach((h) => {
-                    socket.on(h.event, h.handler(socket));
-                });
+                    const handlers = socketMetadata.getAllEventHandlers(ws);
+                    handlers.forEach((h) => {
+                        socket.on(h.event, h.handler(socket));
+                    });
 
-                socket.on("disconnect", (msg) => {
-                    instance.onServerDisconnection(socket, server, msg);
-                });
-            });
+                    if (instance.onServerDisconnection) {
+                        socket.on("disconnect", async (msg) => {
+                            await instance.onServerDisconnection(
+                                socket,
+                                server,
+                            );
+                        });
+                    }
+                }
+            }
         });
         return true;
     }
@@ -37,5 +49,8 @@ export * from "./decorators/onWebSocketEvent";
 export * from "./decorators/webSocketGateway";
 export * from "./decorators/webSocketServer";
 export * from "./meta/socketMetadata";
+export * from "./decorators/webSocketBody";
+export * from "./decorators/webSocketParam";
 export * from "./types/webSocketEventHandler";
 export * from "./types/webSocketGateway";
+export * from "./types/webSocketHandlerParams";

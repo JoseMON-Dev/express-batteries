@@ -1,7 +1,11 @@
 import "reflect-metadata";
 import { expressBatteriesConfig } from "../../meta/config";
 import { Container } from "inversify";
-import type { WebSocketEventHandler } from "../types/webSocketEventHandler";
+import type {
+    WebSocketEventHandler,
+    WebSocketEventHandlerMiddleware,
+} from "../types/webSocketEventHandler";
+import type { WsHandlerParams } from "../types/webSocketHandlerParams";
 
 const webSocketGateWayList: Function[] = [];
 
@@ -9,10 +13,32 @@ export const socketMetadata = {
     EVENT: "ws:event",
     GATEWAY_INSTANCE: "ws:Gateway",
     IOC_CONTAINER: "ws:IOC_Container",
-    SERVER_PARAMETER_INDEX: "ws:class:server:parameterKey",
-    DEPENDENCIES_LEN: "ws:dep_len",
+    PARAMETERS_INDEX_DICT: "ws:class:server:parameterKey",
     HANDLERS: "ws:handlers",
+    MIDDLEWARES: "ws:middlewares:fn",
     IS_GATEWAY: "ws:isgateWay",
+
+    addMiddlewares: (
+        target: object,
+        propertyKey: string | symbol,
+        list: WebSocketEventHandlerMiddleware<unknown>[],
+    ) => {
+        Reflect.defineMetadata(
+            socketMetadata.MIDDLEWARES,
+            list,
+            target,
+            propertyKey,
+        );
+    },
+
+    getMiddlewaresList: (target: object, propertyKey: string | symbol) => {
+        const middlewares = Reflect.getMetadata(
+            socketMetadata.MIDDLEWARES,
+            target,
+            propertyKey,
+        ) || [];
+        return middlewares as WebSocketEventHandlerMiddleware<unknown>[];
+    },
 
     setIsGateWay: (constructor: Function) => {
         Reflect.defineMetadata(socketMetadata.IS_GATEWAY, true, constructor);
@@ -29,35 +55,6 @@ export const socketMetadata = {
 
     getGateWayList: () => {
         return webSocketGateWayList;
-    },
-
-    addDependency: (
-        target: object,
-        propertyKey: string | symbol,
-        numberOfDependencies: number,
-    ) => {
-        const currentSize = socketMetadata.getDependenciesSize(
-            target,
-            propertyKey,
-        );
-
-        Reflect.defineMetadata(
-            socketMetadata.DEPENDENCIES_LEN,
-            currentSize + numberOfDependencies,
-            target,
-            propertyKey,
-        );
-    },
-
-    getDependenciesSize: (
-        target: object,
-        propertyKey: string | symbol,
-    ): number => {
-        return Reflect.getMetadata(
-            socketMetadata.DEPENDENCIES_LEN,
-            target,
-            propertyKey,
-        ) || 0;
     },
 
     setIOCContainer: (constructor: Function, container: Container) => {
@@ -98,29 +95,32 @@ export const socketMetadata = {
         return expressBatteriesConfig.getSocketServer();
     },
 
-    setServerParameterIndex: (
-        target: object,
+    addHandlerParameterIndex: (
+        constructor: Function,
         propertyKey: string | symbol,
         parameterIndex: number,
+        wsHandlerParam: WsHandlerParams,
     ) => {
-        Reflect.defineMetadata(
-            socketMetadata.SERVER_PARAMETER_INDEX,
-            parameterIndex,
-            target,
-            propertyKey,
-        );
-        socketMetadata.addDependency(target, propertyKey, 1);
+        const map = socketMetadata.getParameterIndexDict(constructor);
+        const props = map.get(propertyKey) ||
+            new Map<WsHandlerParams, number>();
+        props.set(wsHandlerParam, parameterIndex);
+        map.set(propertyKey, props);
     },
 
-    getServerParameterIndex: (
-        target: object,
-        propertyKey: string | symbol,
-    ): number | undefined => {
-        return Reflect.getMetadata(
-            socketMetadata.SERVER_PARAMETER_INDEX,
+    getParameterIndexDict: (
+        target: Function,
+    ): Map<string | symbol, Map<WsHandlerParams, number>> => {
+        const map = Reflect.getMetadata(
+            socketMetadata.PARAMETERS_INDEX_DICT,
             target,
-            propertyKey,
+        ) || new Map();
+        Reflect.defineMetadata(
+            socketMetadata.PARAMETERS_INDEX_DICT,
+            map,
+            target,
         );
+        return map;
     },
 
     getAllEventHandlers: (constructor: Function): WebSocketEventHandler[] => {
