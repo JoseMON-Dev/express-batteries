@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -17,21 +17,6 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    },
-    "./express": {
-      "import": "./dist/libs/express/index.js",
-      "require": "./dist/libs/express/index.cjs",
-      "types": "./dits/libs/express/index.d.ts"
-    },
-    "./inversify": {
-      "import": "./dist/libs/inversify/index.js",
-      "require": "./dist/libs/inversify/index.cjs",
-      "types": "./dits/libs/inversify/index.d.ts"
-    },
-    "./valibot": {
-      "import": "./dist/libs/valibot/index.js",
-      "require": "./dist/libs/valibot/index.cjs",
-      "types": "./dits/libs/valibot/index.d.ts"
     },
     "./plugin": {
       "import": "./dist/plugin.js",
