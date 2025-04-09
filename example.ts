@@ -62,6 +62,16 @@ class B {
         res.send(this.service.a());
     }
 }
+const WsMiddleware: WebSocketEventHandlerMiddleware<string> = async (
+    server,
+    socket,
+    ctx,
+    next,
+) => {
+    console.log("middleware ", server.eventNames(), socket.id, ctx);
+    ctx.body = "nuevo";
+    await next();
+};
 
 @WsGateway()
 class Ws {
@@ -74,6 +84,7 @@ class Ws {
     }
 
     @OnWsEvent("sendToWs")
+    @WsMiddlewares([WsMiddleware])
     handleMessage(
         @WsServer() server: Server,
         @WsBody() msg: string,
@@ -82,17 +93,6 @@ class Ws {
         server.to("room-ws").emit("msgFromWs", "WS → mensaje: " + msg);
     }
 }
-
-const WsMiddleware: WebSocketEventHandlerMiddleware<string> = async (
-    server,
-    socket,
-    ctx,
-    next,
-) => {
-    console.log("middleware ", server.eventNames(), socket.id, ctx);
-    ctx.body = "nuevo";
-    await next();
-};
 
 @WsGateway()
 class Ws2 {
