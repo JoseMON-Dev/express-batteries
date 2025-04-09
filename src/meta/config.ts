@@ -1,16 +1,33 @@
 import toJsonSchema from "to-json-schema";
 import { ApiError } from "../errors/baseError";
 import type { ExpressBatteriesConfig } from "../types/config";
-import { Server, type ServerOptions } from "socket.io";
-import express, { type Express } from "express";
-import http from "http";
+import { Server } from "socket.io";
+import express, { type Application } from "express";
+import http from "node:http";
 
-let expressApp: Express | null = null;
-let webSocketsServer = null;
+let expressApp: Application | null = null;
+let webSocketsServer: Server | null = null;
+let httpServer:
+    | http.Server<
+        typeof http.IncomingMessage,
+        typeof http.ServerResponse
+    >
+    | null = null;
 const baseConfig: GlobalConfig = {
     ErrorClass: ApiError,
     cors: {
         origin: "*",
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS",
+            "PATCH",
+            "HEAD",
+            "TRACE",
+        ],
+        credentials: true,
     },
 };
 
@@ -23,7 +40,11 @@ export const expressBatteriesConfig: {
     getConfig: () => GlobalConfig;
     getErrorSchema: () => object;
     getSocketServer: () => Server;
-    getExpressApp: () => Express;
+    getHttpServer: () => http.Server<
+        typeof http.IncomingMessage,
+        typeof http.ServerResponse
+    >;
+    getExpressApp: () => Application;
 } = {
     setConfig: (config: ExpressBatteriesConfig | undefined) => {
         if (config) {
@@ -39,12 +60,21 @@ export const expressBatteriesConfig: {
         );
     },
 
-    getSocketServer: () => {
-        if (webSocketsServer) return webSocketsServer;
-        const server = http.createServer(
+    getHttpServer: () => {
+        if (httpServer) return httpServer;
+        httpServer = http.createServer(
             expressBatteriesConfig.getExpressApp(),
         );
-        return new Server(server, globalConfig.cors as ServerOptions);
+        return httpServer;
+    },
+
+    getSocketServer: () => {
+        if (webSocketsServer) return webSocketsServer;
+        const server = expressBatteriesConfig.getHttpServer();
+        webSocketsServer = new Server(server, {
+            cors: globalConfig.cors,
+        });
+        return webSocketsServer;
     },
 
     getExpressApp: () => {

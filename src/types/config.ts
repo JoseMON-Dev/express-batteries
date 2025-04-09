@@ -1,4 +1,3 @@
-import type { Application } from "express";
 import type { CorsOptions } from "cors";
 
 export type OptionalElement = any | undefined;

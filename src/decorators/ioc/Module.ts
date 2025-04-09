@@ -1,6 +1,8 @@
 import { Container, type Newable, type ServiceIdentifier } from "inversify";
 import { ControllerSymbol, type IController } from "../../types/DevpsSymbols";
-import type { Express } from "express";
+import { socketMetadata } from "../../sockets/meta/socketMetadata";
+import type { ExpressBatteriesApplication } from "../../types";
+import { WebSocketGateWaySymbol } from "../../sockets";
 
 export type DependencyLoader = (container: Container) => void;
 export type ServiceInjectable =
@@ -10,7 +12,8 @@ export interface ModuleProps {
     controllers: Newable<any>[];
     services?: ServiceInjectable[];
     path: `/${string}`;
-    app: Express;
+    app: ExpressBatteriesApplication;
+    webSockets?: Newable<any>[];
     dependencyLoaders?: DependencyLoader[];
 }
 
@@ -21,6 +24,7 @@ export function createModule(
         path,
         app,
         dependencyLoaders,
+        webSockets,
     }: ModuleProps,
 ) {
     if (path === "/") {
@@ -36,6 +40,17 @@ export function createModule(
             : container.bind(service).to(service);
     });
 
+    webSockets?.forEach((ws) => {
+        if (socketMetadata.isGateWay(ws)) {
+            container.bind(Symbol.for(ws.name)).to(ws).inSingletonScope();
+            container.bind(WebSocketGateWaySymbol).to(ws).inSingletonScope();
+            socketMetadata.setIOCContainer(ws, container);
+            socketMetadata.addGateWay(ws);
+        } else {
+            throw new Error(`${ws} is not a webSocket gateway`);
+        }
+    });
+
     controllers.forEach((c) => {
         container.bind(ControllerSymbol).to(
             c,
@@ -43,6 +58,6 @@ export function createModule(
         container.bind(Symbol.for(c.name)).to(c).inSingletonScope();
     });
     container.getAll<IController>(ControllerSymbol).forEach((c) => {
-        c.___setUp___(app, path, container);
+        c.___setUp___(app.express, path, container);
     });
 }
