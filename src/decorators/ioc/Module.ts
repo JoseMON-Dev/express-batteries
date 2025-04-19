@@ -4,7 +4,7 @@ import { socketMetadata } from "../../sockets/meta/socketMetadata";
 import type { ExpressBatteriesApplication } from "../../types";
 import { WebSocketGateWaySymbol } from "../../sockets";
 
-export type DependencyLoader = (container: Container) => void;
+export type DependencyLoader = (container: Container) => void | Promise<void>;
 export type ServiceInjectable =
     | [ServiceIdentifier, Newable<any>]
     | Newable<any>;
@@ -17,7 +17,7 @@ export interface ModuleProps {
     dependencyLoaders?: DependencyLoader[];
 }
 
-export function createModule(
+export async function createModule(
     {
         controllers,
         services,
@@ -28,12 +28,16 @@ export function createModule(
     }: ModuleProps,
 ) {
     if (path === "/") {
-        throw new Error("The path is required oly '/' path is invalid");
+        throw new Error("The path is required only '/' path is invalid");
     }
     const container = new Container();
-    dependencyLoaders?.forEach((fn) => {
-        fn(container);
-    });
+
+    if (dependencyLoaders) {
+        for (const loader of dependencyLoaders) {
+            await loader(container);
+        }
+    }
+
     services?.forEach((service) => {
         Array.isArray(service)
             ? container.bind(service[0]).to(service[1])
