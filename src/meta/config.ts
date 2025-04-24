@@ -4,6 +4,7 @@ import type { ExpressBatteriesConfig } from "../types/config";
 import { Server } from "socket.io";
 import express, { type Application } from "express";
 import http from "node:http";
+import type { ICacheManager } from "../cache";
 
 let expressApp: Application | null = null;
 let webSocketsServer: Server | null = null;
@@ -29,6 +30,7 @@ const baseConfig: GlobalConfig = {
         ],
         credentials: true,
     },
+    cacheManager: null as unknown as ICacheManager,
 };
 
 export type GlobalConfig = Required<ExpressBatteriesConfig>;
@@ -45,6 +47,7 @@ export const expressBatteriesConfig: {
         typeof http.ServerResponse
     >;
     getExpressApp: () => Application;
+    getCacheManager: () => ICacheManager;
 } = {
     setConfig: (config: ExpressBatteriesConfig | undefined) => {
         if (config) {
@@ -81,5 +84,12 @@ export const expressBatteriesConfig: {
         if (expressApp) return expressApp;
         expressApp = express();
         return expressApp;
+    },
+
+    getCacheManager: () => {
+        const cacheManager = globalConfig.cacheManager;
+        if (cacheManager) return cacheManager;
+        console.log("Cache manager not initialized");
+        throw new Error("Cache manager not initialized");
     },
 };

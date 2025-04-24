@@ -1,4 +1,5 @@
 import type { CorsOptions } from "cors";
+import type { ICacheManager } from "../cache";
 
 export type OptionalElement = any | undefined;
 export type RestParams = any[] | undefined[] | OptionalElement;
@@ -14,4 +15,5 @@ export type ErrorClass = new (
 export type ExpressBatteriesConfig = {
     ErrorClass?: ErrorClass | undefined;
     cors?: CorsOptions;
+    cacheManager?: ICacheManager;
 };

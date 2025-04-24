@@ -25,12 +25,74 @@ import {
 import { Server, Socket } from "socket.io";
 import { WsSocket } from "./src/sockets/decorators/webSocketParam";
 import { WsMiddlewares } from "./src/sockets/decorators/webSocketMiddlewares";
+import { ICacheManager } from "./src/cache/types";
+import { cached } from "./src/cache/decorators/cache";
+import { SetCommonOptions, SetGuards, SetTTL } from "./src/cache";
+import { invalidateCache } from "./src/cache/decorators/invalidateCache";
+
+export class InMemoryCacheManager implements ICacheManager {
+    private cache: Map<string, any> = new Map();
+
+    async get<T>(key: string): Promise<T | undefined | null> {
+        const entry = this.cache.get(key);
+        if (!entry) return undefined;
+
+        if (entry.expiresAt < Date.now()) {
+            this.cache.delete(key);
+            return undefined;
+        }
+
+        return entry.value;
+    }
+
+    async set<T>(
+        key: string,
+        value: T,
+        options?: SetTTL & SetGuards & SetCommonOptions,
+    ): Promise<boolean> {
+        this.cache.set(key, { value, options });
+        console.log(this.cache);
+        return true;
+    }
+
+    async keys(pattern: string): Promise<string[]> {
+        const regex = new RegExp(pattern.replace("*", ".*"));
+        return Array.from(this.cache.keys());
+    }
+
+    async delete(key: string): Promise<boolean> {
+        return this.cache.delete(key);
+    }
+
+    async exists(key: string): Promise<boolean> {
+        const entry = this.cache.get(key);
+        if (!entry) return false;
+        return entry.expiresAt >= Date.now();
+    }
+
+    getRawCache(): Map<string, any> {
+        return this.cache;
+    }
+
+    clear(): void {
+        this.cache.clear();
+    }
+}
 
 @injectable()
 class service {
-    a() {
-        console.log(" service from controller call");
-        return "service";
+    @cached({
+        EX: 1,
+    }, (methodName, args) => {
+        return `${methodName}:pee`;
+    })
+    async a() {
+        return Math.random();
+    }
+
+    @invalidateCache("a:pee")
+    async b() {
+        return Math.random();
     }
 }
 
@@ -46,8 +108,9 @@ class a {
         headers: ["application/gzip", "application/json"],
         code: 200,
     })
-    get(req, res) {
-        res.send(this.service.a());
+    async get(req, res) {
+        const b = await this.service.b();
+        res.send(`${b}`);
     }
 }
 
@@ -68,8 +131,9 @@ class B {
         title: v.pipe(v.string(), v.uuid()),
         description: v.optional(v.string()),
     }))
-    exampletestting(req, res) {
-        res.send(this.service.a());
+    async exampletestting(req, res) {
+        const a = await this.service.a();
+        await res.send(`${a}`);
     }
 }
 const WsMiddleware: WebSocketEventHandlerMiddleware<string> = async (
@@ -125,7 +189,9 @@ class Ws2 {
     }
 }
 
-const app = expressBatteries();
+const app = expressBatteries(
+    { cacheManager: new InMemoryCacheManager() },
+);
 app.express.use(express.json());
 new Server();
 
