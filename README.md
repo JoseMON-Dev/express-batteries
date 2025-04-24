@@ -228,3 +228,75 @@ The `@ResponseType` and `@Body` decorators allow automatic OpenAPI documentation
 - Declarative validation.
 - Automatic documentation generation.
 
+## WebSocket Integration
+
+Express Batteries provides built-in support for WebSocket integration using decorators. Below is an example of how to create a WebSocket gateway and handle WebSocket events.
+
+### Example: WebSocket Gateway
+
+```typescript
+import { WsGateway, OnWsEvent, WsSocket, WsServer, WsBody, WsMiddlewares } from 'express-batteries';
+import { Server, Socket } from 'socket.io';
+
+// Middleware for WebSocket events
+const WsMiddleware = async (server: Server, socket: Socket, ctx: { body: string }, next: () => Promise<void>) => {
+    console.log("Middleware executed for event", ctx.body);
+    ctx.body = "Modified by middleware"; // Modify the message body
+    await next(); // Proceed to the next middleware or handler
+};
+
+@WsGateway()
+class ChatGateway {
+    // Event handler for joining a WebSocket room
+    @OnWsEvent("joinRoom")
+    joinRoom(@WsSocket() socket: Socket) {
+        socket.join("chat-room"); // Join the room named "chat-room"
+        socket.emit("roomJoined", "You have joined the chat room"); // Notify the client
+    }
+
+    // Event handler for sending messages to the WebSocket room
+    @OnWsEvent("sendMessage")
+    @WsMiddlewares([WsMiddleware]) // Apply middleware to this event
+    handleMessage(@WsServer() server: Server, @WsBody() message: string) {
+        console.log("Received message:", message);
+        server.to("chat-room").emit("newMessage", message); // Broadcast the message to the room
+    }
+}
+```
+
+### Explanation
+
+1. **`@WsGateway()`**: Marks the class as a WebSocket gateway.
+2. **`@OnWsEvent(eventName)`**: Listens for a specific WebSocket event (e.g., `joinRoom`, `sendMessage`).
+3. **`@WsSocket()`**: Injects the WebSocket `Socket` instance into the handler.
+4. **`@WsServer()`**: Injects the WebSocket `Server` instance into the handler.
+5. **`@WsBody()`**: Injects the message body sent by the client.
+6. **`@WsMiddlewares()`**: Adds middleware to process the event before reaching the handler.
+
+### Registering the Gateway
+
+To use the WebSocket gateway, register it in your application module:
+
+```typescript
+import { createModule, expressBatteries } from 'express-batteries';
+import { ChatGateway } from './path-to-your-gateway';
+
+const app = expressBatteries();
+
+createModule({
+    app,
+    path: '/api',
+    webSockets: [ChatGateway],
+});
+
+app.listen(8080, () => {
+    console.log('Server is running on http://localhost:8080');
+});
+```
+
+### Testing the WebSocket
+
+1. Connect to the WebSocket server using a client (e.g., `socket.io-client`).
+2. Emit the `joinRoom` event to join the chat room.
+3. Emit the `sendMessage` event to send a message to the room.
+
