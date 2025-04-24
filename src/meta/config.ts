@@ -48,6 +48,7 @@ export const expressBatteriesConfig: {
     >;
     getExpressApp: () => Application;
     getCacheManager: () => ICacheManager;
+    getCacheManagerOrNull: () => ICacheManager | null;
 } = {
     setConfig: (config: ExpressBatteriesConfig | undefined) => {
         if (config) {
@@ -91,5 +92,9 @@ export const expressBatteriesConfig: {
         if (cacheManager) return cacheManager;
         console.log("Cache manager not initialized");
         throw new Error("Cache manager not initialized");
+    },
+
+    getCacheManagerOrNull: () => {
+        return globalConfig.cacheManager;
     },
 };

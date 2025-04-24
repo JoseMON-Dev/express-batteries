@@ -34,9 +34,12 @@ export async function createModule(
     }
     const container = new Container();
 
-    container.bind<ICacheManager>(Symbol.for("ICacheManager")).toConstantValue(
-        expressBatteriesConfig.getCacheManager(),
-    );
+    if (expressBatteriesConfig.getCacheManagerOrNull()) {
+        container.bind<ICacheManager>(Symbol.for("ICacheManager"))
+            .toConstantValue(
+                expressBatteriesConfig.getCacheManager(),
+            );
+    }
 
     if (dependencyLoaders) {
         for (const loader of dependencyLoaders) {

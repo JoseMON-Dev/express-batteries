@@ -59,3 +59,4 @@ export * from "./middlewares/index";
 export * from "./types/index";
 export * from "./nameTsPlugin";
 export * from "./sockets/index";
+export * from "./cache/index";
