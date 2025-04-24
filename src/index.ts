@@ -11,6 +11,7 @@ export const expressBatteries = (
     config?: ExpressBatteriesConfig,
 ): ExpressBatteriesApplication => {
     expressBatteriesConfig.setConfig({ ...config });
+
     const app = expressBatteriesConfig.getExpressApp();
     app.use(cors(
         { ...config?.cors },

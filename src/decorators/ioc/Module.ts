@@ -3,6 +3,8 @@ import { ControllerSymbol, type IController } from "../../types/DevpsSymbols";
 import { socketMetadata } from "../../sockets/meta/socketMetadata";
 import type { ExpressBatteriesApplication } from "../../types";
 import { WebSocketGateWaySymbol } from "../../sockets";
+import type { ICacheManager } from "../../cache";
+import { expressBatteriesConfig } from "../../meta";
 
 export type DependencyLoader = (container: Container) => void | Promise<void>;
 export type ServiceInjectable =
@@ -31,6 +33,10 @@ export async function createModule(
         throw new Error("The path is required only '/' path is invalid");
     }
     const container = new Container();
+
+    container.bind<ICacheManager>(Symbol.for("ICacheManager")).toConstantValue(
+        expressBatteriesConfig.getCacheManager(),
+    );
 
     if (dependencyLoaders) {
         for (const loader of dependencyLoaders) {
