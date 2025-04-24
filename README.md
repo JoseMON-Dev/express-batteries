@@ -300,3 +300,68 @@ app.listen(8080, () => {
 2. Emit the `joinRoom` event to join the chat room.
 3. Emit the `sendMessage` event to send a message to the room.
 
+## Caching and Cache Invalidation
+
+Express Batteries provides decorators for caching method results and invalidating cache entries. These decorators simplify cache management in your application.
+
+### Example: Using `@cached`
+
+The `@cached` decorator caches the result of a method for a specified duration. You can also provide a custom key generator function.
+
+```typescript
+import { cached } from "express-batteries";
+
+class ExampleService {
+  @cached({ EX: 10 }, (methodName, args) => `${methodName}:${args[0]}`)
+  async getData(id: string) {
+    console.log("Fetching data...");
+    return { id, value: Math.random() };
+  }
+}
+
+const service = new ExampleService();
+service.getData("123"); // Logs "Fetching data..." and caches the result.
+service.getData("123"); // Returns cached result without logging.
+```
+
+### Example: Using `@invalidateCache`
+
+The `@invalidateCache` decorator invalidates cache entries based on a key or a key generator function.
+
+```typescript
+import { invalidateCache } from "express-batteries";
+
+class ExampleService {
+  @invalidateCache("getData:123")
+  async clearCache() {
+    console.log("Cache invalidated.");
+  }
+}
+
+const service = new ExampleService();
+service.clearCache(); // Logs "Cache invalidated." and removes the cache entry for "getData:123".
+```
+
+### Combining `@cached` and `@invalidateCache`
+
+You can use both decorators in the same class to manage cache effectively.
+
+```typescript
+class ExampleService {
+  @cached({ EX: 10 }, () => "key")
+  async getData(id: string) {
+    return { id, value: Math.random() };
+  }
+
+  @invalidateCache("key")
+  async updateData(id: string, newValue: any) {
+    console.log("Updating data...");
+    return { id, value: newValue };
+  }
+}
+
+const service = new ExampleService();
+service.getData("123"); // Caches the result.
+service.updateData("123", "newValue"); // Invalidates the cache for "getData:123".
+```
+

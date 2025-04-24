@@ -1,9 +1,19 @@
 import { cacheMetadata } from "../meta/cache";
-import { ICacheManager, SetCommonOptions, SetGuards, SetTTL } from "../types";
+import type {
+    ICacheManager,
+    SetCommonOptions,
+    SetGuards,
+    SetTTL,
+} from "../types";
+
+type GenerateKeyFunction = (
+    methodName: string,
+    args: any[],
+) => string;
 
 export function cached(
     options: SetTTL & SetGuards & SetCommonOptions,
-    cacheKeyGenerator?: (methodName: string, args: any[]) => string,
+    cacheKeyGenerator?: GenerateKeyFunction,
 ): MethodDecorator {
     return function (
         target: Object,
