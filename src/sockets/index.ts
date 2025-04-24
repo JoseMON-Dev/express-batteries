@@ -45,12 +45,6 @@ export const startWebSockets = () => {
     return false;
 };
 
-export * from "./decorators/onWebSocketEvent";
-export * from "./decorators/webSocketGateway";
-export * from "./decorators/webSocketServer";
+export * from "./decorators/index";
 export * from "./meta/socketMetadata";
-export * from "./decorators/webSocketBody";
-export * from "./decorators/webSocketParam";
-export * from "./types/webSocketEventHandler";
-export * from "./types/webSocketGateway";
-export * from "./types/webSocketHandlerParams";
+export * from "./types/index";
