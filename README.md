@@ -45,6 +45,12 @@ pnpm add express-batteries
 ```
 
 This plugin allows the use of interfaces in dependency injection without tightly coupling to specific implementations.
+```ts
+import {ExpressBatteriesTs} from "express-batteries"
+
+@inject(ExpressBatteriesTs.name<InterfaceService>())
+private readonly myService: InterfaceService
+```
 
 ---
 
@@ -81,6 +87,7 @@ export const createImageModule = (app: ExpressBatteriesApplication) => {
     controllers: [ImageController],
     webSockets: [TopicWsGetway],
     dependencyLoaders: [InfrastructureLoader, ApplicationLoader],
+    services:[AService, ["customKey", BService]]
   });
 };
 ```
@@ -338,11 +345,41 @@ import { ChatGateway } from './path-to-your-gateway';
 
 const app = expressBatteries();
 
-createModule({
+await createModule({
     app,
     path: '/api',
     webSockets: [ChatGateway],
 });
+
+app.listen(8080, () => {
+    console.log('Server is running on http://localhost:8080');
+});
+
+```
+in case of want use the services from other modules you can pass the module to other
+
+```ts
+import { createModule, expressBatteries } from 'express-batteries';
+import { ChatGateway } from './path-to-your-gateway';
+
+const app = expressBatteries();
+
+const anyMod = await createModule({
+app,
+    path: '/api',
+    controllers: [Controller1, Controller2],
+    services: [AService, BService]
+})
+
+
+await createModule({
+    app,
+    path: '/api',
+    controllers:[],
+    webSockets: [ChatGateway],
+    modules: [anyMod]
+});
+// now you can inject the AService, BService in ChatGateway class or others
 
 app.listen(8080, () => {
     console.log('Server is running on http://localhost:8080');

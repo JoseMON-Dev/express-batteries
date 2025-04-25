@@ -124,7 +124,7 @@ class B {
     ) {
     }
 
-    @Post("/a/:id")
+    @Post("/:id")
     @ResponseType({
         headers: ["application/gzip", "application/json"],
         code: 200,
@@ -152,6 +152,10 @@ const WsMiddleware: WebSocketEventHandlerMiddleware<string> = async (
 
 @WsGateway()
 class Ws {
+    constructor(
+        @inject(service) public service: service,
+    ) {}
+
     @OnWsEvent("joinWs")
     joinRoom(
         @WsSocket() socket: Socket,
@@ -162,11 +166,11 @@ class Ws {
 
     @OnWsEvent("sendToWs")
     @WsMiddlewares([WsMiddleware])
-    handleMessage(
+    async handleMessage(
         @WsServer() server: Server,
         @WsBody() msg: string,
     ) {
-        console.log("WS → mensaje:", msg);
+        console.log("WS → mensaje:", await this.service.a());
         server.to("room-ws").emit("msgFromWs", "WS → mensaje: " + msg);
     }
 }
@@ -196,14 +200,20 @@ const app = expressBatteries(
     { cacheManager: new InMemoryCacheManager() },
 );
 app.express.use(express.json());
-new Server();
 
-createModule({
+const amod = await createModule({
     app,
-    path: "/str",
-    controllers: [a, B],
-    webSockets: [Ws, Ws2],
+    path: "/moda",
+    controllers: [B],
     services: [service],
+});
+
+await createModule({
+    app,
+    path: "/modb",
+    controllers: [a],
+    webSockets: [Ws, Ws2],
+    modules: [amod],
 });
 
 const { html, json } = await swaggerUI({
