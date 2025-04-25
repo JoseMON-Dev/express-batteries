@@ -18,6 +18,7 @@ import {
     onDisconnectSocketGateWay,
     OnWsEvent,
     type WebSocketEventHandlerMiddleware,
+    WebSocketsServer,
     WsBody,
     WsGateway,
     WsServer,
@@ -100,6 +101,7 @@ class service {
 class a {
     constructor(
         @inject(service) public service: service,
+        @inject(WebSocketsServer) public server: Server,
     ) {
     }
 
@@ -110,6 +112,7 @@ class a {
     })
     async get(req, res) {
         const b = await this.service.b();
+        this.server.emit("pepe", "pesdfsdfsfpe");
         res.send(`${b}`);
     }
 }

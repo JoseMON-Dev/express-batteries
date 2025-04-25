@@ -17,31 +17,19 @@ export const expressBatteries = (
         { ...config?.cors },
     ));
     const listen = (port: number) => {
-        const useSocketIoServer = startWebSockets();
-        if (useSocketIoServer) {
-            return expressBatteriesConfig.getHttpServer().listen(
-                port,
-                () => {
-                    if (process.env.NODE_ENV !== "production") {
-                        console.log(
-                            `🚀 Server ready at http://localhost:${port}`,
-                        );
-                        return;
-                    }
-                    console.log("server ready");
-                },
-            );
-        }
-
-        return app.listen(port, () => {
-            if (process.env.NODE_ENV !== "production") {
-                console.log(
-                    `🚀 Server ready at http://localhost:${port}`,
-                );
-                return;
-            }
-            console.log("server ready");
-        });
+        startWebSockets();
+        return expressBatteriesConfig.getHttpServer().listen(
+            port,
+            () => {
+                if (process.env.NODE_ENV !== "production") {
+                    console.log(
+                        `🚀 Server ready at http://localhost:${port}`,
+                    );
+                    return;
+                }
+                console.log("server ready");
+            },
+        );
     };
 
     return {

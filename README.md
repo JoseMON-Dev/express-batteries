@@ -233,7 +233,7 @@ The `@ResponseType` and `@Body` decorators allow automatic OpenAPI documentation
 Express Batteries provides built-in support for WebSocket integration using decorators. Below is an example of how to create a WebSocket gateway and handle WebSocket events.
 
 ### Example: WebSocket Gateway
-
+the web socket gateway is for handling events
 ```typescript
 import { WsGateway, OnWsEvent, WsSocket, WsServer, WsBody, WsMiddlewares } from 'express-batteries';
 import { Server, Socket } from 'socket.io';
@@ -272,6 +272,61 @@ class ChatGateway {
 4. **`@WsServer()`**: Injects the WebSocket `Server` instance into the handler.
 5. **`@WsBody()`**: Injects the message body sent by the client.
 6. **`@WsMiddlewares()`**: Adds middleware to process the event before reaching the handler.
+
+### Emit Events using the server 
+you can create ws emitters to emit events
+```typescript
+import {WebSocketsServer, SocketsMap} from "express-batteries"
+
+class EventEmitService {
+  private readonly clients: SocketsMap 
+
+  constructor(
+    @inject(WebSocketsServer)
+    private server: Server
+  ) {
+    this.clients = server.sockets.sockets
+  }
+
+  emitAlls() {
+    this.server.emit(
+      'newUser', `User ${socket.id} se ha unido`
+    )
+  }
+
+  emitToClient(socketId: string) {
+    this.clients.get(socketId).emit("event", "message")
+  }
+}
+
+// use 
+class useCase {
+  constructor(
+    @inject(EventEmitService)
+    private service: EventEmitService
+  ) {}
+
+  execute(socketId, message) {
+    //login ...
+    this.service.emitToClient(socketId)
+  }
+}
+
+@WsGateway()
+class ChatGateway {
+  constructor(
+    @inject(useCase)
+    private useCase: useCase
+  ) {}
+
+  @OnWsEvent("sendMessage")
+  @WsMiddlewares([WsMiddleware]) // Apply middleware to this event
+  handleMessage(@WsSocket() socket: Socket, @WsBody() message: string) {
+      this.useCase.execute(socket.id, message)
+  }
+}
+
+```
 
 ### Registering the Gateway
 

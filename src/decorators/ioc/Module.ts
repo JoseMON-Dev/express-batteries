@@ -5,6 +5,7 @@ import type { ExpressBatteriesApplication } from "../../types";
 import { WebSocketGateWaySymbol } from "../../sockets";
 import type { ICacheManager } from "../../cache";
 import { expressBatteriesConfig } from "../../meta";
+import { WebSocketsServer } from "../../sockets";
 
 export type DependencyLoader = (container: Container) => void | Promise<void>;
 export type ServiceInjectable =
@@ -53,6 +54,9 @@ export async function createModule(
             : container.bind(service).to(service);
     });
 
+    container.bind(WebSocketsServer).toDynamicValue(() => {
+        return socketMetadata.getServer();
+    });
     webSockets?.forEach((ws) => {
         if (socketMetadata.isGateWay(ws)) {
             container.bind(Symbol.for(ws.name)).to(ws).inSingletonScope();
