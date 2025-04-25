@@ -37,15 +37,21 @@ export const swaggerUI = async (
     html: RequestHandler;
     json: RequestHandler;
 }> => {
-    const doc = await generateSwaggerDoc(props);
-    const docHandler: RequestHandler = (
+    const docHandler: RequestHandler = async (
         _: Request,
         res: Response,
         _n: NextFunction,
     ) => {
+        const doc = await generateSwaggerDoc(props);
         res.json(doc);
     };
-    const routerHtml = Router().use(swaggerUi.serve, swaggerUi.setup(doc));
+    const routerHtml = Router().use(
+        swaggerUi.serve,
+        async (...args: [Request, Response, NextFunction]) => {
+            const doc = await generateSwaggerDoc(props);
+            swaggerUi.setup(doc)(...args);
+        },
+    );
     return {
         html: routerHtml,
         json: docHandler,
