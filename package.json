@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "0.1.13",
+  "version": "0.1.15",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -87,6 +87,7 @@
     "swagger-ui-express": "^5.0.1",
     "to-json-schema": "^0.2.5",
     "tsup": "^8.4.0",
-    "valibot": "1.0.0"
+    "valibot": "1.0.0",
+    "vite": "^6.3.3"
   }
 }

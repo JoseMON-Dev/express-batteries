@@ -5,6 +5,7 @@ import {
     createModule,
     expressBatteries,
     Get,
+    Middleware,
     Params,
     Post,
     ResponseType,
