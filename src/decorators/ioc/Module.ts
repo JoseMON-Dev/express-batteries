@@ -38,6 +38,7 @@ export async function createModule(
         throw new Error("The path is required only '/' path is invalid");
     }
     const container = new Container();
+    setupStaticInjection(container);
 
     if (props.modules && props.modules.length > 0) {
         for (let i = 0; i < props.modules.length; i++) {
@@ -48,7 +49,6 @@ export async function createModule(
         }
     }
 
-    setupStaticInjection(container);
     await setupModuleInjection({ ...props, container }, container);
 
     if (props.webSockets) {
