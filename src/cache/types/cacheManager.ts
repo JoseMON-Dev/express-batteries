@@ -8,6 +8,6 @@ export interface ICacheManager {
         options?: SetTTL & SetGuards & SetCommonOptions,
     ): Promise<boolean>;
     keys(pattern: string): Promise<string[]>;
-    delete(key: string): Promise<boolean>;
+    delete(key: string | string[]): Promise<boolean>;
     exists(key: string): Promise<boolean>;
 }
