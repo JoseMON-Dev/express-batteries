@@ -176,10 +176,14 @@ function invalidateCache(keyOrPattern) {
       const cacheManager = cacheMetadata.getCacheManager();
       const keys = generateKeys(args);
       for (const key of keys) {
-        const deleted = await cacheManager.delete(key);
+        const cacheKeys = await cacheManager.keys(key);
+        const deleted = await cacheManager.delete(cacheKeys);
         if (deleted) {
           if (process.env.NODE_ENV !== "production") {
-            console.log(`[CACHE INVALIDATED] ${key}`);
+            console.log(
+              `[CACHE INVALIDATED] pattern ${key} cacheKeys: 
+ ${cacheKeys}`
+            );
           }
         }
       }

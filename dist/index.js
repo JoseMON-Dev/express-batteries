@@ -7,43 +7,27 @@ import {
 } from "./chunk-WXTLWWCJ.js";
 import "./chunk-3L3IZ6CW.js";
 import "./chunk-TD6XDCJL.js";
+import "./chunk-HTTP7IGP.js";
 import "./chunk-JUOV7IAS.js";
 import {
   cached
 } from "./chunk-MFE2KJS5.js";
 import {
   invalidateCache
-} from "./chunk-VSG6RNV5.js";
+} from "./chunk-UIJULKTR.js";
 import {
   cacheMetadata
 } from "./chunk-7V6XCOFL.js";
-import "./chunk-HTTP7IGP.js";
 import "./chunk-TXT7Z7GS.js";
+import {
+  Query
+} from "./chunk-OMJ2Y7G4.js";
 import {
   Body
 } from "./chunk-32HHVJBJ.js";
 import {
   Params
 } from "./chunk-ZUHRKDHW.js";
-import {
-  Query
-} from "./chunk-B5WQAZ7U.js";
-import {
-  Inject
-} from "./chunk-T6EIFMQ3.js";
-import {
-  createModule
-} from "./chunk-OIT3SDG2.js";
-import {
-  Controller
-} from "./chunk-J276KJ4L.js";
-import {
-  Middleware,
-  Middlewares
-} from "./chunk-7EG24DYV.js";
-import {
-  ResponseType
-} from "./chunk-WQVBRP2T.js";
 import {
   Delete,
   Get,
@@ -55,47 +39,21 @@ import {
   Trace
 } from "./chunk-KTHTQWIM.js";
 import {
-  WebSocketGateWaySymbol,
-  startWebSockets
-} from "./chunk-BYW3QBKY.js";
+  Inject
+} from "./chunk-T6EIFMQ3.js";
 import {
-  WebSocketsServer
-} from "./chunk-J6LY5Z4C.js";
-import "./chunk-NBSTUOJF.js";
-import "./chunk-KJVJ2PGG.js";
-import "./chunk-EXPL37CT.js";
-import "./chunk-Y5AKBUNJ.js";
+  createModule
+} from "./chunk-Y2XCKFBC.js";
 import {
-  OnWsEvent
-} from "./chunk-KQD3UROA.js";
+  Controller
+} from "./chunk-J276KJ4L.js";
 import {
-  WsBody
-} from "./chunk-XG6NMH76.js";
+  Middleware,
+  Middlewares
+} from "./chunk-7EG24DYV.js";
 import {
-  WsGateway
-} from "./chunk-VLT374HP.js";
-import {
-  WsMiddlewares
-} from "./chunk-W3OSWDXI.js";
-import {
-  WsSocket
-} from "./chunk-3X6WAOCG.js";
-import {
-  WsServer
-} from "./chunk-7I3LSHGO.js";
-import {
-  socketMetadata
-} from "./chunk-G7YV7R2W.js";
-import "./chunk-AWTI3FX3.js";
-import {
-  insertAtIndex
-} from "./chunk-TBII24RB.js";
-import {
-  isValibotSchema
-} from "./chunk-O3QR3TO7.js";
-import {
-  setUpControllers
-} from "./chunk-XRIKVWE5.js";
+  ResponseType
+} from "./chunk-KX7XD6UE.js";
 import "./chunk-SW6MGHTU.js";
 import {
   addValidationMiddleware
@@ -118,27 +76,21 @@ import {
   routeMetadata
 } from "./chunk-4M4IRHAX.js";
 import "./chunk-WCQXIIQB.js";
+import "./chunk-3XSLM47Q.js";
 import {
   ALLOWED_METHODS
 } from "./chunk-HDTITGC2.js";
 import "./chunk-A5EQN474.js";
 import "./chunk-ZHIX43HH.js";
+import "./chunk-C2OFKVFO.js";
 import "./chunk-PWUEIIDB.js";
 import "./chunk-HVMHGWNY.js";
 import "./chunk-RYIMOHPT.js";
 import "./chunk-NIB6S4TD.js";
 import "./chunk-OOL5HAVQ.js";
-import "./chunk-3XSLM47Q.js";
-import {
-  DECORATORS_METADATA_KEYS
-} from "./chunk-L5HOEFIA.js";
 import {
   SWAGGER_DOC
 } from "./chunk-IK5VUQLJ.js";
-import "./chunk-C2OFKVFO.js";
-import {
-  ControllerSymbol
-} from "./chunk-TBVPSSES.js";
 import {
   requestValidator
 } from "./chunk-LGLWEMLA.js";
@@ -147,8 +99,59 @@ import {
   httpCodes
 } from "./chunk-2WIR5VWA.js";
 import {
+  WebSocketGateWaySymbol,
+  startWebSockets
+} from "./chunk-BYW3QBKY.js";
+import {
+  WebSocketsServer
+} from "./chunk-J6LY5Z4C.js";
+import "./chunk-NBSTUOJF.js";
+import "./chunk-KJVJ2PGG.js";
+import "./chunk-EXPL37CT.js";
+import "./chunk-Y5AKBUNJ.js";
+import {
+  WsServer
+} from "./chunk-7I3LSHGO.js";
+import {
+  OnWsEvent
+} from "./chunk-KQD3UROA.js";
+import {
+  WsBody
+} from "./chunk-XG6NMH76.js";
+import {
+  WsGateway
+} from "./chunk-VLT374HP.js";
+import {
+  WsMiddlewares
+} from "./chunk-W3OSWDXI.js";
+import {
+  WsSocket
+} from "./chunk-3X6WAOCG.js";
+import {
+  socketMetadata
+} from "./chunk-G7YV7R2W.js";
+import "./chunk-AWTI3FX3.js";
+import {
+  describeSetting
+} from "./chunk-SSYN7GUO.js";
+import {
+  insertAtIndex
+} from "./chunk-TBII24RB.js";
+import {
+  isValibotSchema
+} from "./chunk-O3QR3TO7.js";
+import {
   parse
 } from "./chunk-7K7W34ZL.js";
+import {
+  setUpControllers
+} from "./chunk-XRIKVWE5.js";
+import {
+  ControllerSymbol
+} from "./chunk-TBVPSSES.js";
+import {
+  DECORATORS_METADATA_KEYS
+} from "./chunk-L5HOEFIA.js";
 import {
   expressBatteriesConfig
 } from "./chunk-UVSNYCVZ.js";
@@ -156,9 +159,6 @@ import "./chunk-ZFRYLPIO.js";
 import {
   ApiError
 } from "./chunk-YIHLBXI6.js";
-import {
-  describeSetting
-} from "./chunk-SSYN7GUO.js";
 
 // src/index.ts
 import "reflect-metadata";

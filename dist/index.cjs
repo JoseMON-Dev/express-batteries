@@ -1260,6 +1260,7 @@ async function createModule(props) {
     throw new Error("The path is required only '/' path is invalid");
   }
   const container = new import_inversify3.Container();
+  setupStaticInjection(container);
   if (props.modules && props.modules.length > 0) {
     for (let i = 0; i < props.modules.length; i++) {
       const module2 = props.modules[i];
@@ -1268,7 +1269,6 @@ async function createModule(props) {
       }
     }
   }
-  setupStaticInjection(container);
   await setupModuleInjection({ ...props, container }, container);
   if (props.webSockets) {
     setupWsSocketsInjection(props.webSockets, container);
@@ -1464,10 +1464,14 @@ function invalidateCache(keyOrPattern) {
       const cacheManager = cacheMetadata.getCacheManager();
       const keys = generateKeys(args);
       for (const key of keys) {
-        const deleted = await cacheManager.delete(key);
+        const cacheKeys = await cacheManager.keys(key);
+        const deleted = await cacheManager.delete(cacheKeys);
         if (deleted) {
           if (process.env.NODE_ENV !== "production") {
-            console.log(`[CACHE INVALIDATED] ${key}`);
+            console.log(
+              `[CACHE INVALIDATED] pattern ${key} cacheKeys: 
+ ${cacheKeys}`
+            );
           }
         }
       }

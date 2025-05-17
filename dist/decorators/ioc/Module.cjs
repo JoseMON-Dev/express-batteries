@@ -477,6 +477,7 @@ async function createModule(props) {
     throw new Error("The path is required only '/' path is invalid");
   }
   const container = new import_inversify3.Container();
+  setupStaticInjection(container);
   if (props.modules && props.modules.length > 0) {
     for (let i = 0; i < props.modules.length; i++) {
       const module2 = props.modules[i];
@@ -485,7 +486,6 @@ async function createModule(props) {
       }
     }
   }
-  setupStaticInjection(container);
   await setupModuleInjection({ ...props, container }, container);
   if (props.webSockets) {
     setupWsSocketsInjection(props.webSockets, container);
