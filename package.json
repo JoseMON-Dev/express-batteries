@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -22,6 +22,11 @@
       "import": "./dist/plugin.js",
       "require": "./dist/plugin.cjs",
       "types": "./dist/plugin.d.ts"
+    },
+    "./vitePlugin":{
+      "import": "./dist/vitePlugin.js",
+      "require": "./dist/vitePlugin.cjs",
+      "types": "./dist/vitePlugin.d.ts"
     },
     "./openApi": {
       "import": "./dist/libs/openApi/index.js",
