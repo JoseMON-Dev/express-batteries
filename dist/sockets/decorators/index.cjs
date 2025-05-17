@@ -1,0 +1,389 @@
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/sockets/decorators/index.ts
+var decorators_exports = {};
+__export(decorators_exports, {
+  OnWsEvent: () => OnWsEvent,
+  WsBody: () => WsBody,
+  WsGateway: () => WsGateway,
+  WsMiddlewares: () => WsMiddlewares,
+  WsServer: () => WsServer,
+  WsSocket: () => WsSocket
+});
+module.exports = __toCommonJS(decorators_exports);
+
+// src/sockets/meta/socketMetadata.ts
+var import_reflect_metadata = require("reflect-metadata");
+
+// src/meta/config.ts
+var import_to_json_schema = __toESM(require("to-json-schema"), 1);
+
+// src/errors/baseError.ts
+var ApiError = class extends Error {
+  constructor(message, errors, code) {
+    super(message);
+    this.errors = errors;
+    this.code = code;
+  }
+  toJson() {
+    return {
+      errors: this.errors
+    };
+  }
+};
+
+// src/meta/config.ts
+var import_socket = require("socket.io");
+var import_express = __toESM(require("express"), 1);
+var import_node_http = __toESM(require("http"), 1);
+var import_node_https = __toESM(require("https"), 1);
+var expressApp = null;
+var webSocketsServer = null;
+var httpServer = null;
+var baseConfig = {
+  ErrorClass: ApiError,
+  cors: {
+    origin: "*",
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS",
+      "PATCH",
+      "HEAD",
+      "TRACE"
+    ],
+    credentials: true
+  },
+  cacheManager: null,
+  https: null
+};
+var globalConfig = { ...baseConfig };
+var expressBatteriesConfig = {
+  setConfig: (config) => {
+    if (config) {
+      globalConfig = { ...globalConfig, ...config };
+    }
+  },
+  getConfig: () => globalConfig,
+  getErrorSchema: () => {
+    const Error2 = expressBatteriesConfig.getConfig().ErrorClass;
+    const instance = new Error2("error", ["erer", "sdsd"], 400);
+    return (0, import_to_json_schema.default)(
+      instance.toJson()
+    );
+  },
+  getHttpServer: () => {
+    if (httpServer) return httpServer;
+    if (globalConfig.https) {
+      httpServer = import_node_https.default.createServer(
+        globalConfig.https,
+        expressBatteriesConfig.getExpressApp()
+      );
+    }
+    httpServer = import_node_http.default.createServer(
+      expressBatteriesConfig.getExpressApp()
+    );
+    return httpServer;
+  },
+  getSocketServer: () => {
+    if (webSocketsServer) return webSocketsServer;
+    const server = expressBatteriesConfig.getHttpServer();
+    webSocketsServer = new import_socket.Server(server, {
+      cors: globalConfig.cors
+    });
+    return webSocketsServer;
+  },
+  getExpressApp: () => {
+    if (expressApp) return expressApp;
+    expressApp = (0, import_express.default)();
+    return expressApp;
+  },
+  getCacheManager: () => {
+    const cacheManager = globalConfig.cacheManager;
+    if (cacheManager) return cacheManager;
+    console.log("Cache manager not initialized");
+    throw new Error("Cache manager not initialized");
+  },
+  getCacheManagerOrNull: () => {
+    return globalConfig.cacheManager;
+  }
+};
+
+// src/sockets/meta/socketMetadata.ts
+var import_inversify = require("inversify");
+var webSocketGateWayList = [];
+var socketMetadata = {
+  EVENT: "ws:event",
+  GATEWAY_INSTANCE: "ws:Gateway",
+  IOC_CONTAINER: "ws:IOC_Container",
+  PARAMETERS_INDEX_DICT: "ws:class:server:parameterKey",
+  HANDLERS: "ws:handlers",
+  MIDDLEWARES: "ws:middlewares:fn",
+  IS_GATEWAY: "ws:isgateWay",
+  addMiddlewares: (target, propertyKey, list) => {
+    Reflect.defineMetadata(
+      socketMetadata.MIDDLEWARES,
+      list,
+      target,
+      propertyKey
+    );
+  },
+  getMiddlewaresList: (target, propertyKey) => {
+    const middlewares = Reflect.getMetadata(
+      socketMetadata.MIDDLEWARES,
+      target,
+      propertyKey
+    ) || [];
+    return middlewares;
+  },
+  setIsGateWay: (constructor) => {
+    Reflect.defineMetadata(socketMetadata.IS_GATEWAY, true, constructor);
+  },
+  isGateWay: (constructor) => {
+    return Reflect.getMetadata(socketMetadata.IS_GATEWAY, constructor) || false;
+  },
+  addGateWay: (constructor) => {
+    webSocketGateWayList.push(constructor);
+  },
+  getGateWayList: () => {
+    return webSocketGateWayList;
+  },
+  setIOCContainer: (constructor, container) => {
+    Reflect.defineMetadata(
+      socketMetadata.IOC_CONTAINER,
+      container,
+      constructor
+    );
+  },
+  getIOCContainer: (constructor) => {
+    return Reflect.getMetadata(
+      socketMetadata.IOC_CONTAINER,
+      constructor
+    );
+  },
+  getGateWayInstance: (constructor) => {
+    const container = socketMetadata.getIOCContainer(constructor);
+    const gateWay = Reflect.getMetadata(
+      socketMetadata.GATEWAY_INSTANCE,
+      constructor
+    ) || container !== void 0 ? container?.get(
+      Symbol.for(constructor.name)
+    ) : void 0;
+    Reflect.defineMetadata(
+      socketMetadata.GATEWAY_INSTANCE,
+      gateWay,
+      constructor
+    );
+    return gateWay;
+  },
+  getServer: () => {
+    return expressBatteriesConfig.getSocketServer();
+  },
+  addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
+    const map = socketMetadata.getParameterIndexDict(constructor);
+    const props = map.get(propertyKey) || /* @__PURE__ */ new Map();
+    props.set(wsHandlerParam, parameterIndex);
+    map.set(propertyKey, props);
+  },
+  getParameterIndexDict: (target) => {
+    const map = Reflect.getMetadata(
+      socketMetadata.PARAMETERS_INDEX_DICT,
+      target
+    ) || /* @__PURE__ */ new Map();
+    Reflect.defineMetadata(
+      socketMetadata.PARAMETERS_INDEX_DICT,
+      map,
+      target
+    );
+    return map;
+  },
+  getAllEventHandlers: (constructor) => {
+    return Reflect.getMetadata(socketMetadata.HANDLERS, constructor) || [];
+  },
+  addEventHandler: (handler, constructor) => {
+    const handlers = socketMetadata.getAllEventHandlers(constructor);
+    Reflect.defineMetadata(
+      socketMetadata.HANDLERS,
+      [...handlers, handler],
+      constructor
+    );
+  }
+};
+
+// src/functions/setUpControllers.ts
+var import_express2 = require("express");
+var import_inversify2 = require("inversify");
+
+// src/types/DevpsSymbols.ts
+var ControllerSymbol = Symbol.for("Controller");
+
+// src/functions/parse.ts
+var import_valibot = require("valibot");
+
+// src/functions/insertAtIndex.ts
+function insertAtIndex(arr, index, value, overwrite = false) {
+  for (let i = arr.length; i < index; i++) {
+    if (arr[i] === void 0) {
+      arr[i] = void 0;
+    }
+  }
+  if (overwrite || arr[index] === void 0) {
+    arr[index] = value;
+  }
+}
+
+// src/sockets/decorators/onWebSocketEvent.ts
+function OnWsEvent(event) {
+  return (target, propertyKey) => {
+    const dependencyIndexDict = socketMetadata.getParameterIndexDict(
+      target.constructor
+    );
+    const indexesMap = dependencyIndexDict.get(propertyKey) || /* @__PURE__ */ new Map();
+    const server = socketMetadata.getServer();
+    const handlerParams = /* @__PURE__ */ new Map();
+    handlerParams.set("server", server);
+    const dependencyArray = [];
+    const middlewares = socketMetadata.getMiddlewaresList(
+      target,
+      propertyKey
+    );
+    const fnHandler = (socket) => async (initialBody) => {
+      const context = { body: initialBody };
+      handlerParams.set("body", context.body);
+      handlerParams.set("socket", socket);
+      const fn = target[propertyKey];
+      const socketGateWayInstance = socketMetadata.getGateWayInstance(
+        target.constructor
+      );
+      const handler = fn.bind(socketGateWayInstance);
+      let next = async () => {
+        handlerParams.set("body", context.body);
+        for (const [paramName, index] of indexesMap) {
+          insertAtIndex(
+            dependencyArray,
+            index,
+            handlerParams.get(paramName),
+            true
+          );
+        }
+        await handler(...dependencyArray);
+      };
+      for (let i = middlewares.length - 1; i >= 0; i--) {
+        const current = middlewares[i];
+        if (!current) {
+          throw new Error(
+            "Invalid middleware found undefined at run event " + event
+          );
+        }
+        const prevNext = next;
+        next = async () => {
+          await current(
+            server,
+            socket,
+            context,
+            prevNext
+          );
+        };
+      }
+      await next();
+    };
+    socketMetadata.addEventHandler({
+      event,
+      handler: fnHandler
+    }, target.constructor);
+  };
+}
+
+// src/sockets/decorators/webSocketGateway.ts
+function WsGateway() {
+  return (target) => {
+    socketMetadata.setIsGateWay(target);
+  };
+}
+
+// src/sockets/decorators/webSocketServer.ts
+function WsServer() {
+  return (target, propertyKey, parameterIndex) => {
+    if (target && parameterIndex >= 0 && propertyKey) {
+      socketMetadata.addHandlerParameterIndex(
+        target.constructor,
+        propertyKey,
+        parameterIndex,
+        "server"
+      );
+    }
+  };
+}
+
+// src/sockets/decorators/webSocketBody.ts
+function WsBody() {
+  return (target, propertyKey, parameterIndex) => {
+    if (target && parameterIndex >= 0 && propertyKey) {
+      socketMetadata.addHandlerParameterIndex(
+        target.constructor,
+        propertyKey,
+        parameterIndex,
+        "body"
+      );
+    }
+  };
+}
+
+// src/sockets/decorators/webSocketParam.ts
+function WsSocket() {
+  return (target, propertyKey, parameterIndex) => {
+    if (target && parameterIndex >= 0 && propertyKey) {
+      socketMetadata.addHandlerParameterIndex(
+        target.constructor,
+        propertyKey,
+        parameterIndex,
+        "socket"
+      );
+    }
+  };
+}
+
+// src/sockets/decorators/webSocketMiddlewares.ts
+function WsMiddlewares(middlewares) {
+  return (target, propertyKey) => {
+    socketMetadata.addMiddlewares(target, propertyKey, middlewares);
+  };
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  OnWsEvent,
+  WsBody,
+  WsGateway,
+  WsMiddlewares,
+  WsServer,
+  WsSocket
+});
