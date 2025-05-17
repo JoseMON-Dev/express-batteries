@@ -4,6 +4,7 @@ import type { ExpressBatteriesConfig } from "../types/config";
 import { Server } from "socket.io";
 import express, { type Application } from "express";
 import http from "node:http";
+import https from "node:https";
 import type { ICacheManager } from "../cache";
 
 let expressApp: Application | null = null;
@@ -31,6 +32,7 @@ const baseConfig: GlobalConfig = {
         credentials: true,
     },
     cacheManager: null as unknown as ICacheManager,
+    https: null
 };
 
 export type GlobalConfig = Required<ExpressBatteriesConfig>;
@@ -66,6 +68,12 @@ export const expressBatteriesConfig: {
 
     getHttpServer: () => {
         if (httpServer) return httpServer;
+        if (globalConfig.https) {
+            httpServer = https.createServer(
+                globalConfig.https,
+                expressBatteriesConfig.getExpressApp(),
+            )
+        }
         httpServer = http.createServer(
             expressBatteriesConfig.getExpressApp(),
         );

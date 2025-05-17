@@ -11,9 +11,15 @@ export type ErrorClass = new (
 ) => Error & {
     toJson(): object;
 };
+export type SslOptions  = {
+    key: Buffer;
+    cert: Buffer;
+}
+
 
 export type ExpressBatteriesConfig = {
     ErrorClass?: ErrorClass | undefined;
     cors?: CorsOptions;
     cacheManager?: ICacheManager;
+    https?: SslOptions | undefined | null;
 };
