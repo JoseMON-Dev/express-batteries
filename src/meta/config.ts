@@ -73,6 +73,7 @@ export const expressBatteriesConfig: {
                 globalConfig.https,
                 expressBatteriesConfig.getExpressApp(),
             )
+            return httpServer;
         }
         httpServer = http.createServer(
             expressBatteriesConfig.getExpressApp(),
