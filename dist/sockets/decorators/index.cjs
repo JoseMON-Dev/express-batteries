@@ -108,6 +108,7 @@ var expressBatteriesConfig = {
         globalConfig.https,
         expressBatteriesConfig.getExpressApp()
       );
+      return httpServer;
     }
     httpServer = import_node_http.default.createServer(
       expressBatteriesConfig.getExpressApp()
