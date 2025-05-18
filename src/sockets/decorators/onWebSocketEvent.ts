@@ -2,6 +2,7 @@ import type { Socket } from "socket.io";
 import { socketMetadata } from "../meta/socketMetadata";
 import type { WsHandlerParams } from "../types/webSocketHandlerParams";
 import { insertAtIndex } from "../../functions";
+import { expressBatteriesConfig } from "../../meta";
 
 export function OnWsEvent(
     event: Exclude<string, "connection" | "disconnect">,
@@ -15,17 +16,16 @@ export function OnWsEvent(
         );
         const indexesMap = dependencyIndexDict.get(propertyKey) ||
             new Map<WsHandlerParams, number>();
-
-        const server = socketMetadata.getServer();
-        const handlerParams = new Map<WsHandlerParams, any>();
-        handlerParams.set("server", server);
-        const dependencyArray: any[] = [];
-        const middlewares = socketMetadata.getMiddlewaresList(
-            target,
-            propertyKey,
-        );
-
         const fnHandler = (socket: Socket) => async (initialBody: any) => {
+            const server = expressBatteriesConfig.getSocketServer();
+            const handlerParams = new Map<WsHandlerParams, any>();
+            handlerParams.set("server", server);
+            const dependencyArray: any[] = [];
+            const middlewares = socketMetadata.getMiddlewaresList(
+                target,
+                propertyKey,
+            );
+
             const context = { body: initialBody };
 
             handlerParams.set("body", context.body);

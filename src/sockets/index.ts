@@ -1,3 +1,4 @@
+import { expressBatteriesConfig } from "../meta";
 import { socketMetadata } from "./meta/socketMetadata";
 import type {
     onConnectionWebSocketGateWay,
@@ -9,7 +10,7 @@ export const startWebSockets = () => {
     const webSocketGateWayList = socketMetadata.getGateWayList();
 
     if (socketMetadata.getGateWayList().length > 0) {
-        const server = socketMetadata.getServer();
+        const server = expressBatteriesConfig.getSocketServer();
 
         server.on("connection", async (socket) => {
             for (let i = 0; i < webSocketGateWayList.length; i++) {
