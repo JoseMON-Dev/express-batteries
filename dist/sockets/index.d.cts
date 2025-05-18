@@ -9,8 +9,8 @@ export { SocketsMap, WebSocketsServer } from './types/index.cjs';
 export { Context, WebSocketEventHandler, WebSocketEventHandlerMiddleware } from './types/webSocketEventHandler.cjs';
 export { onConnectionWebSocketGateWay, onDisconnectSocketGateWay } from './types/webSocketGateway.cjs';
 export { WsHandlerParams } from './types/webSocketHandlerParams.cjs';
-import 'socket.io';
 import 'inversify';
+import 'socket.io';
 
 declare const WebSocketGateWaySymbol: unique symbol;
 declare const startWebSockets: () => boolean;

@@ -1,6 +1,6 @@
 import {
   socketMetadata
-} from "./chunk-KUDJHQNN.js";
+} from "./chunk-VQ5JRWOW.js";
 
 // src/sockets/decorators/webSocketServer.ts
 function WsServer() {

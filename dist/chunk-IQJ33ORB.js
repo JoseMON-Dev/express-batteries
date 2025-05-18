@@ -1,6 +1,6 @@
 import {
   socketMetadata
-} from "./chunk-G7YV7R2W.js";
+} from "./chunk-VQ5JRWOW.js";
 
 // src/sockets/decorators/webSocketMiddlewares.ts
 function WsMiddlewares(middlewares) {

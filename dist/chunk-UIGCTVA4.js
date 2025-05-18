@@ -1,13 +1,16 @@
 import {
   socketMetadata
-} from "./chunk-G7YV7R2W.js";
+} from "./chunk-VQ5JRWOW.js";
+import {
+  expressBatteriesConfig
+} from "./chunk-MDVVPD6L.js";
 
 // src/sockets/index.ts
 var WebSocketGateWaySymbol = Symbol.for("WEBSOCKETGATEWAYSYMBOLIOC");
 var startWebSockets = () => {
   const webSocketGateWayList = socketMetadata.getGateWayList();
   if (socketMetadata.getGateWayList().length > 0) {
-    const server = socketMetadata.getServer();
+    const server = expressBatteriesConfig.getSocketServer();
     server.on("connection", async (socket) => {
       for (let i = 0; i < webSocketGateWayList.length; i++) {
         const ws = webSocketGateWayList[i];

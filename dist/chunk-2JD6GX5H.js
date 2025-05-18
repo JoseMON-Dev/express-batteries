@@ -1,9 +1,12 @@
 import {
   socketMetadata
-} from "./chunk-KUDJHQNN.js";
+} from "./chunk-VQ5JRWOW.js";
 import {
   insertAtIndex
 } from "./chunk-TBII24RB.js";
+import {
+  expressBatteriesConfig
+} from "./chunk-MDVVPD6L.js";
 
 // src/sockets/decorators/onWebSocketEvent.ts
 function OnWsEvent(event) {
@@ -12,15 +15,15 @@ function OnWsEvent(event) {
       target.constructor
     );
     const indexesMap = dependencyIndexDict.get(propertyKey) || /* @__PURE__ */ new Map();
-    const server = socketMetadata.getServer();
-    const handlerParams = /* @__PURE__ */ new Map();
-    handlerParams.set("server", server);
-    const dependencyArray = [];
-    const middlewares = socketMetadata.getMiddlewaresList(
-      target,
-      propertyKey
-    );
     const fnHandler = (socket) => async (initialBody) => {
+      const server = expressBatteriesConfig.getSocketServer();
+      const handlerParams = /* @__PURE__ */ new Map();
+      handlerParams.set("server", server);
+      const dependencyArray = [];
+      const middlewares = socketMetadata.getMiddlewaresList(
+        target,
+        propertyKey
+      );
       const context = { body: initialBody };
       handlerParams.set("body", context.body);
       handlerParams.set("socket", socket);

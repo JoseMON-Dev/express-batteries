@@ -1,21 +1,21 @@
 import {
   socketMetadata
-} from "./chunk-G7YV7R2W.js";
+} from "./chunk-VQ5JRWOW.js";
 
-// src/sockets/decorators/webSocketServer.ts
-function WsServer() {
+// src/sockets/decorators/webSocketParam.ts
+function WsSocket() {
   return (target, propertyKey, parameterIndex) => {
     if (target && parameterIndex >= 0 && propertyKey) {
       socketMetadata.addHandlerParameterIndex(
         target.constructor,
         propertyKey,
         parameterIndex,
-        "server"
+        "socket"
       );
     }
   };
 }
 
 export {
-  WsServer
+  WsSocket
 };

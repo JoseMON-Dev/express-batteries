@@ -189,8 +189,392 @@ var expressBatteriesConfig = {
 // src/index.ts
 var import_cors = __toESM(require("cors"), 1);
 
-// src/sockets/meta/socketMetadata.ts
+// src/meta/httpCodes.ts
+var httpCodes = {
+  OK: 200,
+  CREATED: 201,
+  ACCEPTED: 202,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  CONFLICT: 409,
+  INTERNAL_SERVER_ERROR: 500
+};
+var descriptionHttpCode = {
+  200: "OK",
+  201: "Created",
+  202: "Accepted",
+  204: "No Content",
+  400: "Bad Request",
+  401: "Unauthorized",
+  403: "Forbidden",
+  404: "Not Found",
+  405: "Method Not Allowed",
+  409: "Conflict",
+  500: "Internal Server Error",
+  501: "Not Implemented"
+};
+
+// src/meta/decorators.metadata.ts
+var DECORATORS_METADATA_KEYS = {
+  BODY: "router:body",
+  PARAMS: "router:params",
+  QUERIES: "router:queries",
+  MIDDLEWARES: "router:middlewares",
+  PATH: "router:path",
+  ROUTER: "router:router",
+  HAVE_VALIDATION: "router:haveValidation",
+  ROUTES_OPENAPI_INFO: "openapi:routesOpenApiInfo",
+  CONTROLLER_ROUTES_INFO: "openapi:controllerRoutesInfo",
+  ROUTE_RESPONSE: "openapi:routeResponse",
+  IOC_CONTAINER_KEYS: "IOC:iocContainerKeys",
+  IOC_CONTAINER: "IOC:iocContainer",
+  IOC_CONTROLLER_INSTANCE: "controller:instance"
+};
+
+// src/meta/docs_swagger.ts
+var import_valibot_openapi_generator = require("@camflan/valibot-openapi-generator");
+var SWAGGER_DOC = [];
+
+// src/meta/decorators/ioc.ts
 var import_reflect_metadata = require("reflect-metadata");
+var iocMetadata = {
+  getAllDependencies: (target, propertyKey) => {
+    return Reflect.getMetadata(
+      DECORATORS_METADATA_KEYS.IOC_CONTAINER_KEYS,
+      target,
+      propertyKey
+    ) || [];
+  },
+  addDependency: (target, propertyKey, dependency) => {
+    const allDependencies = iocMetadata.getAllDependencies(
+      target,
+      propertyKey
+    );
+    allDependencies.push(dependency);
+    Reflect.defineMetadata(
+      DECORATORS_METADATA_KEYS.IOC_CONTAINER_KEYS,
+      [...allDependencies],
+      target,
+      propertyKey
+    );
+  }
+};
+
+// src/functions/parse.ts
+var import_valibot = require("valibot");
+var parse = (schema, data) => {
+  const errors = [];
+  const result = (0, import_valibot.safeParse)(schema, data);
+  if (!result.success) {
+    errors.push(...result.issues.map((issue) => issue.message));
+    return { success: false, errors, data: {} };
+  }
+  return { success: true, errors, data };
+};
+
+// src/middlewares/requestValidator.ts
+var requestValidator = ({ bodySchema, paramsSchema, querySchema }) => async (req, _, next) => {
+  const BadRequestError = expressBatteriesConfig.getConfig().ErrorClass;
+  if (BadRequestError === void 0 || BadRequestError === null) {
+    throw new Error(
+      "expressBatteriesConfig is not defined errorClass is required"
+    );
+  }
+  const errors = [];
+  if (bodySchema) {
+    if (!req.body) {
+      return next(
+        new BadRequestError(
+          "Missing request body",
+          ["Missing request body"],
+          httpCodes.BAD_REQUEST
+        )
+      );
+    }
+    const result = parse(bodySchema, req.body);
+    if (!result.success) errors.push(...result.errors);
+    else req.body = result.data;
+  }
+  if (paramsSchema) {
+    if (!req.params) {
+      return next(
+        new BadRequestError(
+          "Missing request params",
+          ["Missing request params"],
+          httpCodes.BAD_REQUEST
+        )
+      );
+    }
+    const result = parse(paramsSchema, req.params);
+    if (!result.success) errors.push(...result.errors);
+    else req.params = result.data;
+  }
+  if (querySchema) {
+    if (!req.query) {
+      return next(
+        new BadRequestError(
+          "Missing request query",
+          ["Missing request query"],
+          httpCodes.BAD_REQUEST
+        )
+      );
+    }
+    const result = parse(querySchema, req.query);
+    if (!result.success) errors.push(...result.errors);
+    else req.query = result.data;
+  }
+  if (errors.length > 0) {
+    return next(
+      new BadRequestError(
+        "Bad Request Error",
+        errors,
+        httpCodes.BAD_REQUEST
+      )
+    );
+  }
+  next();
+};
+
+// src/meta/decorators/validators/validators.ts
+var import_reflect_metadata2 = require("reflect-metadata");
+var bodyMetadata = {
+  key: DECORATORS_METADATA_KEYS.BODY,
+  addRouteBody: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(bodyMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${bodyMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Body can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(bodyMetadata.key, value, target, propertyKey);
+  },
+  getRouteBody: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      bodyMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+var queryMetadata = {
+  key: DECORATORS_METADATA_KEYS.QUERIES,
+  addRouteQuery: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(queryMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${queryMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(queryMetadata.key, value, target, propertyKey);
+  },
+  getRouteQuery: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      queryMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+var paramsMetadata = {
+  key: DECORATORS_METADATA_KEYS.PARAMS,
+  addRouteParams: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(paramsMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${paramsMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(paramsMetadata.key, value, target, propertyKey);
+  },
+  getRouteParams: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      paramsMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+
+// src/meta/decorators/route/functions.ts
+function createValidationRequestMiddleware(target, propertyKey) {
+  const bodySchema = bodyMetadata.getRouteBody(target, propertyKey);
+  const paramsSchema = paramsMetadata.getRouteParams(target, propertyKey);
+  const querySchema = queryMetadata.getRouteQuery(target, propertyKey);
+  const handler = requestValidator({
+    bodySchema,
+    paramsSchema,
+    querySchema
+  });
+  return handler;
+}
+
+// src/meta/decorators/route/route.ts
+var import_reflect_metadata3 = require("reflect-metadata");
+var import_express2 = require("express");
+var routeMetadata = {
+  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
+  OPEN_API_INFO: DECORATORS_METADATA_KEYS.ROUTES_OPENAPI_INFO,
+  saveRoutesOpenApiInfo: (metadata, target, propertyKey) => {
+    Reflect.defineMetadata(
+      routeMetadata.OPEN_API_INFO,
+      metadata,
+      target,
+      propertyKey
+    );
+  },
+  getRoutesOpenApiInfo: (target, propertyKey) => {
+    return Reflect.getMetadata(
+      routeMetadata.OPEN_API_INFO,
+      target,
+      propertyKey
+    );
+  },
+  getRouteMiddlewares: (target, propertyKey) => {
+    return routeMetadata.addRouteMiddleware(target, propertyKey);
+  },
+  addRouteMiddleware: (target, propertyKey, middleware) => {
+    let middlewares = Reflect.getMetadata(
+      routeMetadata.MIDDLEWARES,
+      target,
+      propertyKey
+    );
+    if (!middlewares) {
+      middlewares = [];
+    }
+    if (!middleware) {
+      return middlewares;
+    }
+    Reflect.defineMetadata(
+      routeMetadata.MIDDLEWARES,
+      [...middlewares, middleware],
+      target,
+      propertyKey
+    );
+    return [...middlewares, middleware];
+  }
+};
+
+// src/meta/decorators/validators/functions.ts
+function addValidationMiddleware(target, propertyKey) {
+  routeMetadata.addRouteMiddleware(
+    target,
+    propertyKey,
+    createValidationRequestMiddleware(target, propertyKey)
+  );
+}
+
+// src/meta/decorators/controller/controller.ts
+var import_reflect_metadata4 = require("reflect-metadata");
+var import_express3 = require("express");
+
+// src/types/DevpsSymbols.ts
+var ControllerSymbol = Symbol.for("Controller");
+
+// src/types/openApi.ts
+var ALLOWED_METHODS = [
+  "GET",
+  "PUT",
+  "POST",
+  "DELETE",
+  "OPTIONS",
+  "HEAD",
+  "PATCH",
+  "TRACE"
+];
+
+// src/types/ExpressBatteriesApplication.ts
+var import_socket2 = require("socket.io");
+
+// src/meta/decorators/controller/controller.ts
+var controllerMetadata = {
+  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
+  CONTROLLER_ROUTES_INFO: DECORATORS_METADATA_KEYS.CONTROLLER_ROUTES_INFO,
+  IOC_CONTAINER: DECORATORS_METADATA_KEYS.IOC_CONTAINER,
+  ROUTER: DECORATORS_METADATA_KEYS.ROUTER,
+  PATH: DECORATORS_METADATA_KEYS.PATH,
+  INSTANCE: DECORATORS_METADATA_KEYS.IOC_CONTROLLER_INSTANCE,
+  getPath: (constructor) => {
+    return Reflect.getMetadata(controllerMetadata.PATH, constructor);
+  },
+  setPath: (constructor, path) => {
+    Reflect.defineMetadata(controllerMetadata.PATH, path, constructor);
+  },
+  createRouter: (constructor) => {
+    const router = Reflect.getMetadata(controllerMetadata.ROUTER, constructor) || (0, import_express3.Router)();
+    Reflect.defineMetadata(controllerMetadata.ROUTER, router, constructor);
+    return router;
+  },
+  getControllerInstance: (constructor) => {
+    const container = controllerMetadata.getIocContainer(constructor);
+    const controller = Reflect.getMetadata(
+      controllerMetadata.INSTANCE,
+      constructor
+    ) || container !== void 0 ? container?.get(
+      Symbol.for(constructor.name)
+    ) : void 0;
+    Reflect.defineMetadata(
+      controllerMetadata.INSTANCE,
+      controller,
+      constructor
+    );
+    return controller;
+  },
+  getRouter: (constructor) => {
+    return Reflect.getMetadata(controllerMetadata.ROUTER, constructor);
+  },
+  setIocContainer: (constructor, container) => {
+    Reflect.defineMetadata(
+      controllerMetadata.IOC_CONTAINER,
+      container,
+      constructor
+    );
+  },
+  getIocContainer: (constructor) => {
+    return Reflect.getMetadata(
+      controllerMetadata.IOC_CONTAINER,
+      constructor
+    );
+  },
+  addControllerMiddleware: (target, middlewares) => {
+    Reflect.defineMetadata(
+      controllerMetadata.MIDDLEWARES,
+      middlewares,
+      target
+    );
+  },
+  getControllerMiddlewares: (target) => {
+    return Reflect.getMetadata(
+      controllerMetadata.MIDDLEWARES,
+      target
+    ) || [];
+  },
+  addRouteInfoToController: (constructor, routeInfo) => {
+    const controllerRoutesInfo = Reflect.getMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      constructor
+    ) || [];
+    controllerRoutesInfo.push(routeInfo);
+    Reflect.defineMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      controllerRoutesInfo,
+      constructor
+    );
+  },
+  getControllerRoutesInfo: (constructor) => {
+    const controllerRoutesInfo = Reflect.getMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      constructor
+    ) || [];
+    return controllerRoutesInfo;
+  }
+};
+
+// src/sockets/meta/socketMetadata.ts
+var import_reflect_metadata5 = require("reflect-metadata");
 var import_inversify = require("inversify");
 var webSocketGateWayList = [];
 var socketMetadata = {
@@ -257,9 +641,6 @@ var socketMetadata = {
     );
     return gateWay;
   },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
-  },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);
     const props = map.get(propertyKey) || /* @__PURE__ */ new Map();
@@ -297,13 +678,8 @@ function isValibotSchema(obj) {
 }
 
 // src/functions/setUpControllers.ts
-var import_express2 = require("express");
+var import_express4 = require("express");
 var import_inversify2 = require("inversify");
-
-// src/types/DevpsSymbols.ts
-var ControllerSymbol = Symbol.for("Controller");
-
-// src/functions/setUpControllers.ts
 var setUpControllers = (app, container, path) => {
   const controllers = container.getAll(
     ControllerSymbol
@@ -317,18 +693,6 @@ var setUpControllers = (app, container, path) => {
     controller.___setUp___(app, path, container);
   });
   return app;
-};
-
-// src/functions/parse.ts
-var import_valibot = require("valibot");
-var parse = (schema, data) => {
-  const errors = [];
-  const result = (0, import_valibot.safeParse)(schema, data);
-  if (!result.success) {
-    errors.push(...result.issues.map((issue) => issue.message));
-    return { success: false, errors, data: {} };
-  }
-  return { success: true, errors, data };
 };
 
 // src/functions/describeSetting.ts
@@ -361,15 +725,15 @@ function OnWsEvent(event) {
       target.constructor
     );
     const indexesMap = dependencyIndexDict.get(propertyKey) || /* @__PURE__ */ new Map();
-    const server = socketMetadata.getServer();
-    const handlerParams = /* @__PURE__ */ new Map();
-    handlerParams.set("server", server);
-    const dependencyArray = [];
-    const middlewares = socketMetadata.getMiddlewaresList(
-      target,
-      propertyKey
-    );
     const fnHandler = (socket) => async (initialBody) => {
+      const server = expressBatteriesConfig.getSocketServer();
+      const handlerParams = /* @__PURE__ */ new Map();
+      handlerParams.set("server", server);
+      const dependencyArray = [];
+      const middlewares = socketMetadata.getMiddlewaresList(
+        target,
+        propertyKey
+      );
       const context = { body: initialBody };
       handlerParams.set("body", context.body);
       handlerParams.set("socket", socket);
@@ -480,7 +844,7 @@ var WebSocketGateWaySymbol = Symbol.for("WEBSOCKETGATEWAYSYMBOLIOC");
 var startWebSockets = () => {
   const webSocketGateWayList2 = socketMetadata.getGateWayList();
   if (socketMetadata.getGateWayList().length > 0) {
-    const server = socketMetadata.getServer();
+    const server = expressBatteriesConfig.getSocketServer();
     server.on("connection", async (socket) => {
       for (let i = 0; i < webSocketGateWayList2.length; i++) {
         const ws = webSocketGateWayList2[i];
@@ -513,132 +877,6 @@ var startWebSockets = () => {
 
 // src/decorators/routes/Controller.ts
 var import_valibot_openapi_generator2 = require("@camflan/valibot-openapi-generator");
-
-// src/meta/decorators/controller/controller.ts
-var import_reflect_metadata2 = require("reflect-metadata");
-var import_express3 = require("express");
-
-// src/meta/decorators.metadata.ts
-var DECORATORS_METADATA_KEYS = {
-  BODY: "router:body",
-  PARAMS: "router:params",
-  QUERIES: "router:queries",
-  MIDDLEWARES: "router:middlewares",
-  PATH: "router:path",
-  ROUTER: "router:router",
-  HAVE_VALIDATION: "router:haveValidation",
-  ROUTES_OPENAPI_INFO: "openapi:routesOpenApiInfo",
-  CONTROLLER_ROUTES_INFO: "openapi:controllerRoutesInfo",
-  ROUTE_RESPONSE: "openapi:routeResponse",
-  IOC_CONTAINER_KEYS: "IOC:iocContainerKeys",
-  IOC_CONTAINER: "IOC:iocContainer",
-  IOC_CONTROLLER_INSTANCE: "controller:instance"
-};
-
-// src/types/openApi.ts
-var ALLOWED_METHODS = [
-  "GET",
-  "PUT",
-  "POST",
-  "DELETE",
-  "OPTIONS",
-  "HEAD",
-  "PATCH",
-  "TRACE"
-];
-
-// src/types/ExpressBatteriesApplication.ts
-var import_socket2 = require("socket.io");
-
-// src/meta/decorators/controller/controller.ts
-var controllerMetadata = {
-  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
-  CONTROLLER_ROUTES_INFO: DECORATORS_METADATA_KEYS.CONTROLLER_ROUTES_INFO,
-  IOC_CONTAINER: DECORATORS_METADATA_KEYS.IOC_CONTAINER,
-  ROUTER: DECORATORS_METADATA_KEYS.ROUTER,
-  PATH: DECORATORS_METADATA_KEYS.PATH,
-  INSTANCE: DECORATORS_METADATA_KEYS.IOC_CONTROLLER_INSTANCE,
-  getPath: (constructor) => {
-    return Reflect.getMetadata(controllerMetadata.PATH, constructor);
-  },
-  setPath: (constructor, path) => {
-    Reflect.defineMetadata(controllerMetadata.PATH, path, constructor);
-  },
-  createRouter: (constructor) => {
-    const router = Reflect.getMetadata(controllerMetadata.ROUTER, constructor) || (0, import_express3.Router)();
-    Reflect.defineMetadata(controllerMetadata.ROUTER, router, constructor);
-    return router;
-  },
-  getControllerInstance: (constructor) => {
-    const container = controllerMetadata.getIocContainer(constructor);
-    const controller = Reflect.getMetadata(
-      controllerMetadata.INSTANCE,
-      constructor
-    ) || container !== void 0 ? container?.get(
-      Symbol.for(constructor.name)
-    ) : void 0;
-    Reflect.defineMetadata(
-      controllerMetadata.INSTANCE,
-      controller,
-      constructor
-    );
-    return controller;
-  },
-  getRouter: (constructor) => {
-    return Reflect.getMetadata(controllerMetadata.ROUTER, constructor);
-  },
-  setIocContainer: (constructor, container) => {
-    Reflect.defineMetadata(
-      controllerMetadata.IOC_CONTAINER,
-      container,
-      constructor
-    );
-  },
-  getIocContainer: (constructor) => {
-    return Reflect.getMetadata(
-      controllerMetadata.IOC_CONTAINER,
-      constructor
-    );
-  },
-  addControllerMiddleware: (target, middlewares) => {
-    Reflect.defineMetadata(
-      controllerMetadata.MIDDLEWARES,
-      middlewares,
-      target
-    );
-  },
-  getControllerMiddlewares: (target) => {
-    return Reflect.getMetadata(
-      controllerMetadata.MIDDLEWARES,
-      target
-    ) || [];
-  },
-  addRouteInfoToController: (constructor, routeInfo) => {
-    const controllerRoutesInfo = Reflect.getMetadata(
-      controllerMetadata.CONTROLLER_ROUTES_INFO,
-      constructor
-    ) || [];
-    controllerRoutesInfo.push(routeInfo);
-    Reflect.defineMetadata(
-      controllerMetadata.CONTROLLER_ROUTES_INFO,
-      controllerRoutesInfo,
-      constructor
-    );
-  },
-  getControllerRoutesInfo: (constructor) => {
-    const controllerRoutesInfo = Reflect.getMetadata(
-      controllerMetadata.CONTROLLER_ROUTES_INFO,
-      constructor
-    ) || [];
-    return controllerRoutesInfo;
-  }
-};
-
-// src/meta/docs_swagger.ts
-var import_valibot_openapi_generator = require("@camflan/valibot-openapi-generator");
-var SWAGGER_DOC = [];
-
-// src/decorators/routes/Controller.ts
 function Controller(path) {
   return (target) => {
     const router = controllerMetadata.getRouter(target);
@@ -669,52 +907,6 @@ function Controller(path) {
   };
 }
 
-// src/meta/decorators/route/route.ts
-var import_reflect_metadata3 = require("reflect-metadata");
-var import_express4 = require("express");
-var routeMetadata = {
-  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
-  OPEN_API_INFO: DECORATORS_METADATA_KEYS.ROUTES_OPENAPI_INFO,
-  saveRoutesOpenApiInfo: (metadata, target, propertyKey) => {
-    Reflect.defineMetadata(
-      routeMetadata.OPEN_API_INFO,
-      metadata,
-      target,
-      propertyKey
-    );
-  },
-  getRoutesOpenApiInfo: (target, propertyKey) => {
-    return Reflect.getMetadata(
-      routeMetadata.OPEN_API_INFO,
-      target,
-      propertyKey
-    );
-  },
-  getRouteMiddlewares: (target, propertyKey) => {
-    return routeMetadata.addRouteMiddleware(target, propertyKey);
-  },
-  addRouteMiddleware: (target, propertyKey, middleware) => {
-    let middlewares = Reflect.getMetadata(
-      routeMetadata.MIDDLEWARES,
-      target,
-      propertyKey
-    );
-    if (!middlewares) {
-      middlewares = [];
-    }
-    if (!middleware) {
-      return middlewares;
-    }
-    Reflect.defineMetadata(
-      routeMetadata.MIDDLEWARES,
-      [...middlewares, middleware],
-      target,
-      propertyKey
-    );
-    return [...middlewares, middleware];
-  }
-};
-
 // src/decorators/routes/Middleware.ts
 function Middleware(middleware) {
   return (target, propertyKey) => {
@@ -736,35 +928,6 @@ function Middlewares(...middlewares) {
     }
   };
 }
-
-// src/meta/httpCodes.ts
-var httpCodes = {
-  OK: 200,
-  CREATED: 201,
-  ACCEPTED: 202,
-  NO_CONTENT: 204,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  METHOD_NOT_ALLOWED: 405,
-  CONFLICT: 409,
-  INTERNAL_SERVER_ERROR: 500
-};
-var descriptionHttpCode = {
-  200: "OK",
-  201: "Created",
-  202: "Accepted",
-  204: "No Content",
-  400: "Bad Request",
-  401: "Unauthorized",
-  403: "Forbidden",
-  404: "Not Found",
-  405: "Method Not Allowed",
-  409: "Conflict",
-  500: "Internal Server Error",
-  501: "Not Implemented"
-};
 
 // src/decorators/routes/Response.ts
 var import_to_json_schema2 = __toESM(require("to-json-schema"), 1);
@@ -836,31 +999,6 @@ var ResponseType = ({ code, description, schema, headers }) => {
       );
     }
   };
-};
-
-// src/meta/decorators/ioc.ts
-var import_reflect_metadata4 = require("reflect-metadata");
-var iocMetadata = {
-  getAllDependencies: (target, propertyKey) => {
-    return Reflect.getMetadata(
-      DECORATORS_METADATA_KEYS.IOC_CONTAINER_KEYS,
-      target,
-      propertyKey
-    ) || [];
-  },
-  addDependency: (target, propertyKey, dependency) => {
-    const allDependencies = iocMetadata.getAllDependencies(
-      target,
-      propertyKey
-    );
-    allDependencies.push(dependency);
-    Reflect.defineMetadata(
-      DECORATORS_METADATA_KEYS.IOC_CONTAINER_KEYS,
-      [...allDependencies],
-      target,
-      propertyKey
-    );
-  }
 };
 
 // src/decorators/routes/Route.ts
@@ -972,151 +1110,6 @@ var Patch = createRouteDecorator("PATCH");
 var Head = createRouteDecorator("HEAD");
 var Options = createRouteDecorator("OPTIONS");
 var Trace = createRouteDecorator("TRACE");
-
-// src/middlewares/requestValidator.ts
-var requestValidator = ({ bodySchema, paramsSchema, querySchema }) => async (req, _, next) => {
-  const BadRequestError = expressBatteriesConfig.getConfig().ErrorClass;
-  if (BadRequestError === void 0 || BadRequestError === null) {
-    throw new Error(
-      "expressBatteriesConfig is not defined errorClass is required"
-    );
-  }
-  const errors = [];
-  if (bodySchema) {
-    if (!req.body) {
-      return next(
-        new BadRequestError(
-          "Missing request body",
-          ["Missing request body"],
-          httpCodes.BAD_REQUEST
-        )
-      );
-    }
-    const result = parse(bodySchema, req.body);
-    if (!result.success) errors.push(...result.errors);
-    else req.body = result.data;
-  }
-  if (paramsSchema) {
-    if (!req.params) {
-      return next(
-        new BadRequestError(
-          "Missing request params",
-          ["Missing request params"],
-          httpCodes.BAD_REQUEST
-        )
-      );
-    }
-    const result = parse(paramsSchema, req.params);
-    if (!result.success) errors.push(...result.errors);
-    else req.params = result.data;
-  }
-  if (querySchema) {
-    if (!req.query) {
-      return next(
-        new BadRequestError(
-          "Missing request query",
-          ["Missing request query"],
-          httpCodes.BAD_REQUEST
-        )
-      );
-    }
-    const result = parse(querySchema, req.query);
-    if (!result.success) errors.push(...result.errors);
-    else req.query = result.data;
-  }
-  if (errors.length > 0) {
-    return next(
-      new BadRequestError(
-        "Bad Request Error",
-        errors,
-        httpCodes.BAD_REQUEST
-      )
-    );
-  }
-  next();
-};
-
-// src/meta/decorators/validators/validators.ts
-var import_reflect_metadata5 = require("reflect-metadata");
-var bodyMetadata = {
-  key: DECORATORS_METADATA_KEYS.BODY,
-  addRouteBody: (value, target, propertyKey) => {
-    if (Reflect.getMetadata(bodyMetadata.key, target, propertyKey)) {
-      throw new Error(
-        `Metadata ${bodyMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Body can only be defined once`
-      );
-    }
-    Reflect.defineMetadata(bodyMetadata.key, value, target, propertyKey);
-  },
-  getRouteBody: (target, propertyKey) => {
-    const metadata = Reflect.getMetadata(
-      bodyMetadata.key,
-      target,
-      propertyKey
-    );
-    return metadata;
-  }
-};
-var queryMetadata = {
-  key: DECORATORS_METADATA_KEYS.QUERIES,
-  addRouteQuery: (value, target, propertyKey) => {
-    if (Reflect.getMetadata(queryMetadata.key, target, propertyKey)) {
-      throw new Error(
-        `Metadata ${queryMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
-      );
-    }
-    Reflect.defineMetadata(queryMetadata.key, value, target, propertyKey);
-  },
-  getRouteQuery: (target, propertyKey) => {
-    const metadata = Reflect.getMetadata(
-      queryMetadata.key,
-      target,
-      propertyKey
-    );
-    return metadata;
-  }
-};
-var paramsMetadata = {
-  key: DECORATORS_METADATA_KEYS.PARAMS,
-  addRouteParams: (value, target, propertyKey) => {
-    if (Reflect.getMetadata(paramsMetadata.key, target, propertyKey)) {
-      throw new Error(
-        `Metadata ${paramsMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
-      );
-    }
-    Reflect.defineMetadata(paramsMetadata.key, value, target, propertyKey);
-  },
-  getRouteParams: (target, propertyKey) => {
-    const metadata = Reflect.getMetadata(
-      paramsMetadata.key,
-      target,
-      propertyKey
-    );
-    return metadata;
-  }
-};
-
-// src/meta/decorators/route/functions.ts
-function createValidationRequestMiddleware(target, propertyKey) {
-  const bodySchema = bodyMetadata.getRouteBody(target, propertyKey);
-  const paramsSchema = paramsMetadata.getRouteParams(target, propertyKey);
-  const querySchema = queryMetadata.getRouteQuery(target, propertyKey);
-  const handler = requestValidator({
-    bodySchema,
-    paramsSchema,
-    querySchema
-  });
-  return handler;
-}
-
-// src/meta/decorators/validators/functions.ts
-function addValidationMiddleware(target, propertyKey) {
-  routeMetadata.addRouteMiddleware(
-    target,
-    propertyKey,
-    createValidationRequestMiddleware(target, propertyKey)
-  );
-}
 
 // src/decorators/routes/validators/Body.ts
 function Body(schema) {
@@ -1334,7 +1327,7 @@ var setupStaticInjection = (container) => {
     );
   }
   container.bind(WebSocketsServer).toDynamicValue(() => {
-    return socketMetadata.getServer();
+    return expressBatteriesConfig.getSocketServer();
   });
 };
 

@@ -1,7 +1,7 @@
-import * as socket_io from 'socket.io';
 import { Container } from 'inversify';
 import { WebSocketEventHandlerMiddleware, WebSocketEventHandler } from '../types/webSocketEventHandler.js';
 import { WsHandlerParams } from '../types/webSocketHandlerParams.js';
+import 'socket.io';
 
 declare const socketMetadata: {
     EVENT: string;
@@ -20,7 +20,6 @@ declare const socketMetadata: {
     setIOCContainer: (constructor: Function, container: Container) => void;
     getIOCContainer: (constructor: Function) => Container | undefined;
     getGateWayInstance: (constructor: Function) => object | undefined;
-    getServer: () => socket_io.Server<socket_io.DefaultEventsMap, socket_io.DefaultEventsMap, socket_io.DefaultEventsMap, any>;
     addHandlerParameterIndex: (constructor: Function, propertyKey: string | symbol, parameterIndex: number, wsHandlerParam: WsHandlerParams) => void;
     getParameterIndexDict: (target: Function) => Map<string | symbol, Map<WsHandlerParams, number>>;
     getAllEventHandlers: (constructor: Function) => WebSocketEventHandler[];

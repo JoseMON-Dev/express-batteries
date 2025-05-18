@@ -201,9 +201,6 @@ var socketMetadata = {
     );
     return gateWay;
   },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
-  },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);
     const props = map.get(propertyKey) || /* @__PURE__ */ new Map();
@@ -257,6 +254,226 @@ function insertAtIndex(arr, index, value, overwrite = false) {
   }
 }
 
+// src/meta/decorators.metadata.ts
+var DECORATORS_METADATA_KEYS = {
+  BODY: "router:body",
+  PARAMS: "router:params",
+  QUERIES: "router:queries",
+  MIDDLEWARES: "router:middlewares",
+  PATH: "router:path",
+  ROUTER: "router:router",
+  HAVE_VALIDATION: "router:haveValidation",
+  ROUTES_OPENAPI_INFO: "openapi:routesOpenApiInfo",
+  CONTROLLER_ROUTES_INFO: "openapi:controllerRoutesInfo",
+  ROUTE_RESPONSE: "openapi:routeResponse",
+  IOC_CONTAINER_KEYS: "IOC:iocContainerKeys",
+  IOC_CONTAINER: "IOC:iocContainer",
+  IOC_CONTROLLER_INSTANCE: "controller:instance"
+};
+
+// src/meta/docs_swagger.ts
+var import_valibot_openapi_generator = require("@camflan/valibot-openapi-generator");
+
+// src/meta/decorators/ioc.ts
+var import_reflect_metadata2 = require("reflect-metadata");
+
+// src/meta/decorators/validators/validators.ts
+var import_reflect_metadata3 = require("reflect-metadata");
+var bodyMetadata = {
+  key: DECORATORS_METADATA_KEYS.BODY,
+  addRouteBody: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(bodyMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${bodyMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Body can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(bodyMetadata.key, value, target, propertyKey);
+  },
+  getRouteBody: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      bodyMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+var queryMetadata = {
+  key: DECORATORS_METADATA_KEYS.QUERIES,
+  addRouteQuery: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(queryMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${queryMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(queryMetadata.key, value, target, propertyKey);
+  },
+  getRouteQuery: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      queryMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+var paramsMetadata = {
+  key: DECORATORS_METADATA_KEYS.PARAMS,
+  addRouteParams: (value, target, propertyKey) => {
+    if (Reflect.getMetadata(paramsMetadata.key, target, propertyKey)) {
+      throw new Error(
+        `Metadata ${paramsMetadata.key} already exists on ${target.constructor.name}#${typeof propertyKey === "symbol" ? propertyKey.description : propertyKey}. Params can only be defined once`
+      );
+    }
+    Reflect.defineMetadata(paramsMetadata.key, value, target, propertyKey);
+  },
+  getRouteParams: (target, propertyKey) => {
+    const metadata = Reflect.getMetadata(
+      paramsMetadata.key,
+      target,
+      propertyKey
+    );
+    return metadata;
+  }
+};
+
+// src/meta/decorators/route/route.ts
+var import_reflect_metadata4 = require("reflect-metadata");
+var import_express3 = require("express");
+var routeMetadata = {
+  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
+  OPEN_API_INFO: DECORATORS_METADATA_KEYS.ROUTES_OPENAPI_INFO,
+  saveRoutesOpenApiInfo: (metadata, target, propertyKey) => {
+    Reflect.defineMetadata(
+      routeMetadata.OPEN_API_INFO,
+      metadata,
+      target,
+      propertyKey
+    );
+  },
+  getRoutesOpenApiInfo: (target, propertyKey) => {
+    return Reflect.getMetadata(
+      routeMetadata.OPEN_API_INFO,
+      target,
+      propertyKey
+    );
+  },
+  getRouteMiddlewares: (target, propertyKey) => {
+    return routeMetadata.addRouteMiddleware(target, propertyKey);
+  },
+  addRouteMiddleware: (target, propertyKey, middleware) => {
+    let middlewares = Reflect.getMetadata(
+      routeMetadata.MIDDLEWARES,
+      target,
+      propertyKey
+    );
+    if (!middlewares) {
+      middlewares = [];
+    }
+    if (!middleware) {
+      return middlewares;
+    }
+    Reflect.defineMetadata(
+      routeMetadata.MIDDLEWARES,
+      [...middlewares, middleware],
+      target,
+      propertyKey
+    );
+    return [...middlewares, middleware];
+  }
+};
+
+// src/meta/decorators/controller/controller.ts
+var import_reflect_metadata5 = require("reflect-metadata");
+var import_express4 = require("express");
+
+// src/types/ExpressBatteriesApplication.ts
+var import_socket2 = require("socket.io");
+
+// src/meta/decorators/controller/controller.ts
+var controllerMetadata = {
+  MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
+  CONTROLLER_ROUTES_INFO: DECORATORS_METADATA_KEYS.CONTROLLER_ROUTES_INFO,
+  IOC_CONTAINER: DECORATORS_METADATA_KEYS.IOC_CONTAINER,
+  ROUTER: DECORATORS_METADATA_KEYS.ROUTER,
+  PATH: DECORATORS_METADATA_KEYS.PATH,
+  INSTANCE: DECORATORS_METADATA_KEYS.IOC_CONTROLLER_INSTANCE,
+  getPath: (constructor) => {
+    return Reflect.getMetadata(controllerMetadata.PATH, constructor);
+  },
+  setPath: (constructor, path) => {
+    Reflect.defineMetadata(controllerMetadata.PATH, path, constructor);
+  },
+  createRouter: (constructor) => {
+    const router = Reflect.getMetadata(controllerMetadata.ROUTER, constructor) || (0, import_express4.Router)();
+    Reflect.defineMetadata(controllerMetadata.ROUTER, router, constructor);
+    return router;
+  },
+  getControllerInstance: (constructor) => {
+    const container = controllerMetadata.getIocContainer(constructor);
+    const controller = Reflect.getMetadata(
+      controllerMetadata.INSTANCE,
+      constructor
+    ) || container !== void 0 ? container?.get(
+      Symbol.for(constructor.name)
+    ) : void 0;
+    Reflect.defineMetadata(
+      controllerMetadata.INSTANCE,
+      controller,
+      constructor
+    );
+    return controller;
+  },
+  getRouter: (constructor) => {
+    return Reflect.getMetadata(controllerMetadata.ROUTER, constructor);
+  },
+  setIocContainer: (constructor, container) => {
+    Reflect.defineMetadata(
+      controllerMetadata.IOC_CONTAINER,
+      container,
+      constructor
+    );
+  },
+  getIocContainer: (constructor) => {
+    return Reflect.getMetadata(
+      controllerMetadata.IOC_CONTAINER,
+      constructor
+    );
+  },
+  addControllerMiddleware: (target, middlewares) => {
+    Reflect.defineMetadata(
+      controllerMetadata.MIDDLEWARES,
+      middlewares,
+      target
+    );
+  },
+  getControllerMiddlewares: (target) => {
+    return Reflect.getMetadata(
+      controllerMetadata.MIDDLEWARES,
+      target
+    ) || [];
+  },
+  addRouteInfoToController: (constructor, routeInfo) => {
+    const controllerRoutesInfo = Reflect.getMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      constructor
+    ) || [];
+    controllerRoutesInfo.push(routeInfo);
+    Reflect.defineMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      controllerRoutesInfo,
+      constructor
+    );
+  },
+  getControllerRoutesInfo: (constructor) => {
+    const controllerRoutesInfo = Reflect.getMetadata(
+      controllerMetadata.CONTROLLER_ROUTES_INFO,
+      constructor
+    ) || [];
+    return controllerRoutesInfo;
+  }
+};
+
 // src/sockets/decorators/onWebSocketEvent.ts
 function OnWsEvent(event) {
   return (target, propertyKey) => {
@@ -264,15 +481,15 @@ function OnWsEvent(event) {
       target.constructor
     );
     const indexesMap = dependencyIndexDict.get(propertyKey) || /* @__PURE__ */ new Map();
-    const server = socketMetadata.getServer();
-    const handlerParams = /* @__PURE__ */ new Map();
-    handlerParams.set("server", server);
-    const dependencyArray = [];
-    const middlewares = socketMetadata.getMiddlewaresList(
-      target,
-      propertyKey
-    );
     const fnHandler = (socket) => async (initialBody) => {
+      const server = expressBatteriesConfig.getSocketServer();
+      const handlerParams = /* @__PURE__ */ new Map();
+      handlerParams.set("server", server);
+      const dependencyArray = [];
+      const middlewares = socketMetadata.getMiddlewaresList(
+        target,
+        propertyKey
+      );
       const context = { body: initialBody };
       handlerParams.set("body", context.body);
       handlerParams.set("socket", socket);

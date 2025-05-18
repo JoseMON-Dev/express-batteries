@@ -1,7 +1,3 @@
-import {
-  expressBatteriesConfig
-} from "./chunk-MDVVPD6L.js";
-
 // src/sockets/meta/socketMetadata.ts
 import "reflect-metadata";
 import "inversify";
@@ -69,9 +65,6 @@ var socketMetadata = {
       constructor
     );
     return gateWay;
-  },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
   },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);

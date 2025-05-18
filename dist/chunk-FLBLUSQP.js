@@ -1,18 +1,18 @@
 import {
   WebSocketGateWaySymbol
-} from "./chunk-BYW3QBKY.js";
+} from "./chunk-UIGCTVA4.js";
 import {
   WebSocketsServer
 } from "./chunk-J6LY5Z4C.js";
 import {
   socketMetadata
-} from "./chunk-G7YV7R2W.js";
+} from "./chunk-VQ5JRWOW.js";
 import {
   ControllerSymbol
 } from "./chunk-TBVPSSES.js";
 import {
   expressBatteriesConfig
-} from "./chunk-UVSNYCVZ.js";
+} from "./chunk-MDVVPD6L.js";
 
 // src/decorators/ioc/Module.ts
 import { Container } from "inversify";
@@ -21,6 +21,7 @@ async function createModule(props) {
     throw new Error("The path is required only '/' path is invalid");
   }
   const container = new Container();
+  setupStaticInjection(container);
   if (props.modules && props.modules.length > 0) {
     for (let i = 0; i < props.modules.length; i++) {
       const module = props.modules[i];
@@ -29,7 +30,6 @@ async function createModule(props) {
       }
     }
   }
-  setupStaticInjection(container);
   await setupModuleInjection({ ...props, container }, container);
   if (props.webSockets) {
     setupWsSocketsInjection(props.webSockets, container);
@@ -94,7 +94,7 @@ var setupStaticInjection = (container) => {
     );
   }
   container.bind(WebSocketsServer).toDynamicValue(() => {
-    return socketMetadata.getServer();
+    return expressBatteriesConfig.getSocketServer();
   });
 };
 

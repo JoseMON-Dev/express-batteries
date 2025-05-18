@@ -205,9 +205,6 @@ var socketMetadata = {
     );
     return gateWay;
   },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
-  },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);
     const props = map.get(propertyKey) || /* @__PURE__ */ new Map();
@@ -239,19 +236,6 @@ var socketMetadata = {
   }
 };
 
-// src/functions/setUpControllers.ts
-var import_express2 = require("express");
-var import_inversify2 = require("inversify");
-
-// src/functions/parse.ts
-var import_valibot = require("valibot");
-
-// src/sockets/types/index.ts
-var WebSocketsServer = "6b376b734d980df4c233";
-
-// src/sockets/index.ts
-var WebSocketGateWaySymbol = Symbol.for("WEBSOCKETGATEWAYSYMBOLIOC");
-
 // src/meta/decorators.metadata.ts
 var DECORATORS_METADATA_KEYS = {
   BODY: "router:body",
@@ -274,6 +258,9 @@ var import_valibot_openapi_generator = require("@camflan/valibot-openapi-generat
 
 // src/meta/decorators/ioc.ts
 var import_reflect_metadata2 = require("reflect-metadata");
+
+// src/functions/parse.ts
+var import_valibot = require("valibot");
 
 // src/meta/decorators/validators/validators.ts
 var import_reflect_metadata3 = require("reflect-metadata");
@@ -337,7 +324,7 @@ var paramsMetadata = {
 
 // src/meta/decorators/route/route.ts
 var import_reflect_metadata4 = require("reflect-metadata");
-var import_express3 = require("express");
+var import_express2 = require("express");
 var routeMetadata = {
   MIDDLEWARES: DECORATORS_METADATA_KEYS.MIDDLEWARES,
   OPEN_API_INFO: DECORATORS_METADATA_KEYS.ROUTES_OPENAPI_INFO,
@@ -383,7 +370,7 @@ var routeMetadata = {
 
 // src/meta/decorators/controller/controller.ts
 var import_reflect_metadata5 = require("reflect-metadata");
-var import_express4 = require("express");
+var import_express3 = require("express");
 
 // src/types/ExpressBatteriesApplication.ts
 var import_socket2 = require("socket.io");
@@ -403,7 +390,7 @@ var controllerMetadata = {
     Reflect.defineMetadata(controllerMetadata.PATH, path, constructor);
   },
   createRouter: (constructor) => {
-    const router = Reflect.getMetadata(controllerMetadata.ROUTER, constructor) || (0, import_express4.Router)();
+    const router = Reflect.getMetadata(controllerMetadata.ROUTER, constructor) || (0, import_express3.Router)();
     Reflect.defineMetadata(controllerMetadata.ROUTER, router, constructor);
     return router;
   },
@@ -471,6 +458,16 @@ var controllerMetadata = {
     return controllerRoutesInfo;
   }
 };
+
+// src/functions/setUpControllers.ts
+var import_express4 = require("express");
+var import_inversify2 = require("inversify");
+
+// src/sockets/types/index.ts
+var WebSocketsServer = "6b376b734d980df4c233";
+
+// src/sockets/index.ts
+var WebSocketGateWaySymbol = Symbol.for("WEBSOCKETGATEWAYSYMBOLIOC");
 
 // src/decorators/ioc/Module.ts
 async function createModule(props) {
@@ -551,7 +548,7 @@ var setupStaticInjection = (container) => {
     );
   }
   container.bind(WebSocketsServer).toDynamicValue(() => {
-    return socketMetadata.getServer();
+    return expressBatteriesConfig.getSocketServer();
   });
 };
 // Annotate the CommonJS export names for ESM import in node:

@@ -57,9 +57,6 @@ var import_socket = require("socket.io");
 var import_express = __toESM(require("express"), 1);
 var import_node_http = __toESM(require("http"), 1);
 var import_node_https = __toESM(require("https"), 1);
-var expressApp = null;
-var webSocketsServer = null;
-var httpServer = null;
 var baseConfig = {
   ErrorClass: ApiError,
   cors: {
@@ -80,57 +77,6 @@ var baseConfig = {
   https: null
 };
 var globalConfig = { ...baseConfig };
-var expressBatteriesConfig = {
-  setConfig: (config) => {
-    if (config) {
-      globalConfig = { ...globalConfig, ...config };
-    }
-  },
-  getConfig: () => globalConfig,
-  getErrorSchema: () => {
-    const Error2 = expressBatteriesConfig.getConfig().ErrorClass;
-    const instance = new Error2("error", ["erer", "sdsd"], 400);
-    return (0, import_to_json_schema.default)(
-      instance.toJson()
-    );
-  },
-  getHttpServer: () => {
-    if (httpServer) return httpServer;
-    if (globalConfig.https) {
-      httpServer = import_node_https.default.createServer(
-        globalConfig.https,
-        expressBatteriesConfig.getExpressApp()
-      );
-      return httpServer;
-    }
-    httpServer = import_node_http.default.createServer(
-      expressBatteriesConfig.getExpressApp()
-    );
-    return httpServer;
-  },
-  getSocketServer: () => {
-    if (webSocketsServer) return webSocketsServer;
-    const server = expressBatteriesConfig.getHttpServer();
-    webSocketsServer = new import_socket.Server(server, {
-      cors: globalConfig.cors
-    });
-    return webSocketsServer;
-  },
-  getExpressApp: () => {
-    if (expressApp) return expressApp;
-    expressApp = (0, import_express.default)();
-    return expressApp;
-  },
-  getCacheManager: () => {
-    const cacheManager = globalConfig.cacheManager;
-    if (cacheManager) return cacheManager;
-    console.log("Cache manager not initialized");
-    throw new Error("Cache manager not initialized");
-  },
-  getCacheManagerOrNull: () => {
-    return globalConfig.cacheManager;
-  }
-};
 
 // src/sockets/meta/socketMetadata.ts
 var import_inversify = require("inversify");
@@ -198,9 +144,6 @@ var socketMetadata = {
       constructor
     );
     return gateWay;
-  },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
   },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);

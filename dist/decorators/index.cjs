@@ -982,9 +982,6 @@ var socketMetadata = {
     );
     return gateWay;
   },
-  getServer: () => {
-    return expressBatteriesConfig.getSocketServer();
-  },
   addHandlerParameterIndex: (constructor, propertyKey, parameterIndex, wsHandlerParam) => {
     const map = socketMetadata.getParameterIndexDict(constructor);
     const props = map.get(propertyKey) || /* @__PURE__ */ new Map();
@@ -1105,7 +1102,7 @@ var setupStaticInjection = (container) => {
     );
   }
   container.bind(WebSocketsServer).toDynamicValue(() => {
-    return socketMetadata.getServer();
+    return expressBatteriesConfig.getSocketServer();
   });
 };
 // Annotate the CommonJS export names for ESM import in node:
