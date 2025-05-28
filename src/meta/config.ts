@@ -6,6 +6,7 @@ import express, { type Application } from "express";
 import http from "node:http";
 import https from "node:https";
 import type { ICacheManager } from "../cache";
+import cors from "cors";
 
 let expressApp: Application | null = null;
 let webSocketsServer: Server | null = null;
@@ -94,6 +95,10 @@ export const expressBatteriesConfig: {
     getExpressApp: () => {
         if (expressApp) return expressApp;
         expressApp = express();
+        expressApp.use(cors(
+            { ...globalConfig.cors },
+        ));
+
         return expressApp;
     },
 

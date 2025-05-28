@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { expressBatteriesConfig } from "./meta/config";
 import type { ExpressBatteriesConfig } from "./types/config";
-import cors from "cors";
 import type {
     ExpressBatteriesApplication,
 } from "./types/ExpressBatteriesApplication";
@@ -13,9 +12,7 @@ export const expressBatteries = async (
     expressBatteriesConfig.setConfig({ ...config });
 
     const app = expressBatteriesConfig.getExpressApp();
-    app.use(cors(
-        { ...config?.cors },
-    ));
+
     const listen = async (port: number) => {
         if (config && config.wsAdapterGenerator) {
             await startWebSockets(config.wsAdapterGenerator);
