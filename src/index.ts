@@ -7,17 +7,21 @@ import type {
 } from "./types/ExpressBatteriesApplication";
 import { startWebSockets } from "./sockets/index";
 
-export const expressBatteries = (
+export const expressBatteries = async (
     config?: ExpressBatteriesConfig,
-): ExpressBatteriesApplication => {
+): Promise<ExpressBatteriesApplication> => {
     expressBatteriesConfig.setConfig({ ...config });
 
     const app = expressBatteriesConfig.getExpressApp();
     app.use(cors(
         { ...config?.cors },
     ));
-    const listen = (port: number) => {
-        startWebSockets();
+    const listen = async (port: number) => {
+        if (config && config.wsAdapterGenerator) {
+            await startWebSockets(config.wsAdapterGenerator);
+        } else {
+            await startWebSockets();
+        }
         return expressBatteriesConfig.getHttpServer().listen(
             port,
             () => {

@@ -1,16 +1,22 @@
 import { socketMetadata } from "./meta/socketMetadata";
+import type { WebSocketAdapterGenerator } from "./types/index";
 import type {
     onConnectionWebSocketGateWay,
     onDisconnectSocketGateWay,
 } from "./types/webSocketGateway";
 export const WebSocketGateWaySymbol = Symbol.for("WEBSOCKETGATEWAYSYMBOLIOC");
 
-export const startWebSockets = () => {
+export const startWebSockets = async (
+    wsAdapterGenerator: undefined | WebSocketAdapterGenerator = undefined,
+) => {
     const webSocketGateWayList = socketMetadata.getGateWayList();
 
     if (socketMetadata.getGateWayList().length > 0) {
         const server = socketMetadata.getServer();
-
+        if (wsAdapterGenerator) {
+            const adapter = await wsAdapterGenerator();
+            server.adapter(adapter);
+        }
         server.on("connection", async (socket) => {
             for (let i = 0; i < webSocketGateWayList.length; i++) {
                 const ws = webSocketGateWayList[i];

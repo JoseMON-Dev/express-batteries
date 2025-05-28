@@ -32,7 +32,8 @@ const baseConfig: GlobalConfig = {
         credentials: true,
     },
     cacheManager: null as unknown as ICacheManager,
-    https: null
+    https: null,
+    wsAdapterGenerator: null,
 };
 
 export type GlobalConfig = Required<ExpressBatteriesConfig>;
@@ -72,7 +73,7 @@ export const expressBatteriesConfig: {
             httpServer = https.createServer(
                 globalConfig.https,
                 expressBatteriesConfig.getExpressApp(),
-            )
+            );
         }
         httpServer = http.createServer(
             expressBatteriesConfig.getExpressApp(),

@@ -4,7 +4,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "version": "0.1.17",
+  "version": "0.1.21",
   "repository": {
     "url": "https://github.com/JoseMON-Dev/express-batteries"
   },
@@ -23,7 +23,7 @@
       "require": "./dist/plugin.cjs",
       "types": "./dist/plugin.d.ts"
     },
-    "./vitePlugin":{
+    "./vitePlugin": {
       "import": "./dist/vitePlugin.js",
       "require": "./dist/vitePlugin.cjs",
       "types": "./dist/vitePlugin.d.ts"
@@ -89,6 +89,7 @@
     "inversify": "^7.5.0",
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.1",
+    "socket.io-adapter": "^2.5.5",
     "swagger-ui-express": "^5.0.1",
     "to-json-schema": "^0.2.5",
     "tsup": "^8.4.0",

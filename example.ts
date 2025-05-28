@@ -197,7 +197,7 @@ class Ws2 {
     }
 }
 
-const app = expressBatteries(
+const app = await expressBatteries(
     { cacheManager: new InMemoryCacheManager() },
 );
 app.express.use(express.json());
@@ -259,4 +259,4 @@ export const errorHandlingMiddleware = (
 };
 
 app.express.use(errorHandlingMiddleware);
-app.listen(8080);
+await app.listen(8080);
