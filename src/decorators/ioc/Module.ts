@@ -142,6 +142,6 @@ const setupStaticInjection = (container: Container) => {
             );
     }
     container.bind(WebSocketsServer).toDynamicValue(() => {
-        return socketMetadata.getServer();
+        return expressBatteriesConfig.getSocketServer();
     });
 };

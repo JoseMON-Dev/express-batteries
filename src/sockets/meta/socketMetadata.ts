@@ -91,9 +91,7 @@ export const socketMetadata = {
         return gateWay as object;
     },
 
-    getServer: () => {
-        return expressBatteriesConfig.getSocketServer();
-    },
+    
 
     addHandlerParameterIndex: (
         constructor: Function,

@@ -1,3 +1,4 @@
+import { expressBatteriesConfig } from "../meta";
 import { socketMetadata } from "./meta/socketMetadata";
 import type { WebSocketAdapterGenerator } from "./types/index";
 import type {
@@ -10,9 +11,9 @@ export const startWebSockets = async (
     wsAdapterGenerator: undefined | WebSocketAdapterGenerator = undefined,
 ) => {
     const webSocketGateWayList = socketMetadata.getGateWayList();
+    const server = expressBatteriesConfig.getSocketServer();
 
     if (socketMetadata.getGateWayList().length > 0) {
-        const server = socketMetadata.getServer();
         if (wsAdapterGenerator) {
             const adapter = await wsAdapterGenerator();
             server.adapter(adapter);
