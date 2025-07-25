@@ -7,7 +7,7 @@ import type { ICacheManager } from "../../cache";
 import { expressBatteriesConfig } from "../../meta";
 import { WebSocketsServer } from "../../sockets";
 
-export type DependencyLoader = (container: Container) => void | Promise<void>;
+export type DependencyLoader<T> = (container: Container) => Promise<T> | T;
 export type ServiceInjectable =
     | [ServiceIdentifier, Newable<any>]
     | Newable<any>;
@@ -17,7 +17,7 @@ export interface ModuleProps {
     path: `/${string}`;
     app: ExpressBatteriesApplication;
     webSockets?: Newable<any>[];
-    dependencyLoaders?: DependencyLoader[];
+    dependencyLoaders?: DependencyLoader<void>[];
     modules?: Module[];
 }
 
@@ -27,7 +27,7 @@ export interface Module {
     path: `/${string}`;
     app: ExpressBatteriesApplication;
     webSockets?: Newable<any>[];
-    dependencyLoaders?: DependencyLoader[];
+    dependencyLoaders?: DependencyLoader<void>[];
     container: Container;
 }
 
@@ -82,7 +82,7 @@ const setupModuleInjection = async (
 };
 
 const setupDependencyLoaders = async (
-    dependencyLoaders: DependencyLoader[],
+    dependencyLoaders: DependencyLoader<void>[],
     container: Container,
 ) => {
     for (const loader of dependencyLoaders) {

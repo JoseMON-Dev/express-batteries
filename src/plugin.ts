@@ -6,7 +6,7 @@ export default function transformer(program: any) {
                 if (
                     ts.isPropertyAccessExpression(node.expression) &&
                     ts.isIdentifier(node.expression.expression) &&
-                    node.expression.expression.text === "ExpressBatteriesTs" &&
+                    (node.expression.expression.text === "ExpressBatteriesTs" || node.expression.expression.text === "Ts") &&
                     node.expression.name.text === "name"
                 ) {
                     if (node.typeArguments && node.typeArguments.length === 1) {

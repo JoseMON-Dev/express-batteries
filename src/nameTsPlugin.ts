@@ -1,7 +1,13 @@
 namespace ExpressBatteriesTs {
     export function name<T>(): string {
-        return "";
+        throw new Error("This function should be transformed by the TypeScript plugin.");
     }
 }
 
-export { ExpressBatteriesTs };
+namespace Ts {
+    export function name<T>(): string {
+        throw new Error("This function should be transformed by the TypeScript plugin.");
+    }
+}
+
+export { ExpressBatteriesTs, Ts };
